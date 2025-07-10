@@ -12,10 +12,17 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
 
+# Add apps directory to Python path
+import sys
+sys.path.insert(0, os.path.join(PROJECT_DIR, 'apps'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -87,8 +94,15 @@ WSGI_APPLICATION = "pyconng.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv('DB_NAME', 'pyconng_db'),
+        "USER": os.getenv('DB_USER', 'pyconng_user'),
+        "PASSWORD": os.getenv('DB_PASSWORD', 'pyconng_password'),
+        "HOST": os.getenv('DB_HOST', 'localhost'),
+        "PORT": os.getenv('DB_PORT', '5432'),
+        'OPTIONS': {
+            'options': f"-c search_path={os.getenv('DB_SCHEMA', 'pyconng')}"
+        }
     }
 }
 

@@ -1,4 +1,28 @@
-# Use an official Python runtime based on Debian 12 "bookworm" as a parent image.
+# Multi-stage build for frontend assets
+FROM node:18-alpine AS frontend-builder
+
+# Set working directory for frontend build
+WORKDIR /app
+
+# Copy package files for frontend dependencies
+COPY package*.json ./
+
+# Install Node.js dependencies
+RUN npm ci --only=production
+
+# Copy source files needed for frontend build
+COPY tailwind.config.js ./
+COPY pyconng/static/css/src ./pyconng/static/css/src
+COPY pyconng/static/js ./pyconng/static/js
+COPY pyconng/templates ./pyconng/templates
+COPY pyconng/apps ./pyconng/apps
+COPY home/templates ./home/templates
+COPY search/templates ./search/templates
+
+# Build Tailwind CSS
+RUN npm run build
+
+# Main Python application stage
 FROM python:3.12-slim-bookworm
 
 # Add user that will be used in the container.
@@ -35,12 +59,16 @@ RUN pip install -r /requirements.txt
 WORKDIR /app
 
 # Set this directory to be owned by the "wagtail" user. This Wagtail project
-# uses SQLite, the folder needs to be owned by the user that
+# uses PostgreSQL, the folder needs to be owned by the user that
 # will be writing to the database file.
 RUN chown wagtail:wagtail /app
 
 # Copy the source code of the project into the container.
 COPY --chown=wagtail:wagtail . .
+
+# Copy built frontend assets from the frontend-builder stage
+COPY --from=frontend-builder --chown=wagtail:wagtail /app/pyconng/static/css/pyconng.css ./pyconng/static/css/
+COPY --from=frontend-builder --chown=wagtail:wagtail /app/node_modules/alpinejs/dist/cdn.min.js ./pyconng/static/js/alpine.min.js
 
 # Use user "wagtail" to run the build commands below and the server itself.
 USER wagtail

@@ -1,7 +1,7 @@
 {% load static wagtailcore_tags wagtailuserbar %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="2024">
     <head>
         <meta charset="utf-8" />
         <title>
@@ -23,24 +23,61 @@
         <base target="_blank">
         {% endif %}
 
-        {# Global stylesheets #}
+        {# Preload fonts for better performance #}
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+        {# Global stylesheets - Tailwind CSS #}
         <link rel="stylesheet" type="text/css" href="{% static 'css/pyconng.css' %}">
 
         {% block extra_css %}
         {# Override this in templates to add extra stylesheets #}
         {% endblock %}
+
+        {# Favicon and meta tags #}
+        <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+        <meta name="theme-color" content="#0ea5e9">
+        
+        {# Open Graph / Facebook #}
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="{% block og_title %}{% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}{% endblock %}">
+        <meta property="og:description" content="{% block og_description %}{{ page.search_description|default:'PyCon Nigeria - The premier Python conference in Nigeria' }}{% endblock %}">
+        <meta property="og:image" content="{% block og_image %}{% static 'images/og-image.jpg' %}{% endblock %}">
+        
+        {# Twitter #}
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:title" content="{% block twitter_title %}{% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}{% endblock %}">
+        <meta property="twitter:description" content="{% block twitter_description %}{{ page.search_description|default:'PyCon Nigeria - The premier Python conference in Nigeria' }}{% endblock %}">
+        <meta property="twitter:image" content="{% block twitter_image %}{% static 'images/og-image.jpg' %}{% endblock %}">
     </head>
 
-    <body class="{% block body_class %}{% endblock %}">
+    <body class="{% block body_class %}{% endblock %} font-sans antialiased bg-gray-50 text-gray-900"
+          x-data="theme()">
         {% wagtailuserbar %}
 
         {% block content %}{% endblock %}
 
-        {# Global javascript #}
-        <script type="text/javascript" src="{% static 'js/pyconng.js' %}"></script>
+        {# Global javascript - Alpine.js first, then custom scripts #}
+        <script defer src="{% static 'js/alpine.min.js' %}"></script>
+        <script type="module" src="{% static 'js/pyconng.js' %}"></script>
 
         {% block extra_js %}
         {# Override this in templates to add extra javascript #}
         {% endblock %}
+
+        {# Development helpers #}
+        {% if settings.DEBUG %}
+        <script>
+            // Live reload for development
+            if (typeof EventSource !== 'undefined') {
+                var source = new EventSource('/dev/reload/');
+                source.onmessage = function(event) {
+                    if (event.data === 'reload') {
+                        location.reload();
+                    }
+                };
+            }
+        </script>
+        {% endif %}
     </body>
 </html>

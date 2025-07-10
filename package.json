@@ -1,0 +1,26 @@
+{
+  "name": "pycon-nigeria-website",
+  "version": "1.0.0",
+  "description": "PyCon Nigeria conference management platform",
+  "main": "index.js",
+  "scripts": {
+    "build-css": "tailwindcss -i ./pyconng/static/css/src/input.css -o ./pyconng/static/css/pyconng.css --watch",
+    "build-css-prod": "tailwindcss -i ./pyconng/static/css/src/input.css -o ./pyconng/static/css/pyconng.css --minify",
+    "dev": "concurrently \"npm run build-css\" \"python manage.py runserver\"",
+    "build": "npm run build-css-prod"
+  },
+  "keywords": ["django", "wagtail", "conference", "tailwind", "alpine"],
+  "author": "PyCon Nigeria",
+  "license": "MIT",
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.10",
+    "autoprefixer": "^10.4.16",
+    "concurrently": "^8.2.2",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.3.6"
+  },
+  "dependencies": {
+    "alpinejs": "^3.13.3"
+  }
+} 

@@ -36,7 +36,7 @@ A PyCon Nigeria conference management platform built with Wagtail CMS and Django
 
 1. **Clone and setup**:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/jetemi/ng-pycon.git
    cd ng-pycon
    ./scripts/setup-dev.sh
    ```

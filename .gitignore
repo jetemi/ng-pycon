@@ -54,14 +54,5 @@ pyconng/static/js/alpine.min.js
 *.swo
 *~
 
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
 # Docker
 .dockerignore

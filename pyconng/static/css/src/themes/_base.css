@@ -1,0 +1,97 @@
+/* Base Theme Structure for PyCon Nigeria
+ * This file defines the common theming infrastructure that all yearly themes inherit from
+ */
+
+/* Default theme variables (fallback) */
+:root {
+  --theme-primary: #0ea5e9;
+  --theme-primary-50: #f0f9ff;
+  --theme-primary-100: #e0f2fe;
+  --theme-primary-200: #bae6fd;
+  --theme-primary-300: #7dd3fc;
+  --theme-primary-400: #38bdf8;
+  --theme-primary-500: #0ea5e9;
+  --theme-primary-600: #0284c7;
+  --theme-primary-700: #0369a1;
+  --theme-primary-800: #075985;
+  --theme-primary-900: #0c4a6e;
+  
+  --theme-secondary: #ef4444;
+  --theme-secondary-50: #fef2f2;
+  --theme-secondary-100: #fee2e2;
+  --theme-secondary-200: #fecaca;
+  --theme-secondary-300: #fca5a5;
+  --theme-secondary-400: #f87171;
+  --theme-secondary-500: #ef4444;
+  --theme-secondary-600: #dc2626;
+  --theme-secondary-700: #b91c1c;
+  --theme-secondary-800: #991b1b;
+  --theme-secondary-900: #7f1d1d;
+  
+  --theme-accent: #84cc16;
+  --theme-accent-50: #f7fee7;
+  --theme-accent-100: #ecfccb;
+  --theme-accent-200: #d9f99d;
+  --theme-accent-300: #bef264;
+  --theme-accent-400: #a3e635;
+  --theme-accent-500: #84cc16;
+  --theme-accent-600: #65a30d;
+  --theme-accent-700: #4d7c0f;
+  --theme-accent-800: #3f6212;
+  --theme-accent-900: #365314;
+}
+
+/* Theme-aware utility classes */
+.bg-theme-primary { background-color: var(--theme-primary); }
+.text-theme-primary { color: var(--theme-primary); }
+.border-theme-primary { border-color: var(--theme-primary); }
+
+.bg-theme-secondary { background-color: var(--theme-secondary); }
+.text-theme-secondary { color: var(--theme-secondary); }
+.border-theme-secondary { border-color: var(--theme-secondary); }
+
+.bg-theme-accent { background-color: var(--theme-accent); }
+.text-theme-accent { color: var(--theme-accent); }
+.border-theme-accent { border-color: var(--theme-accent); }
+
+/* Theme-aware gradients */
+.bg-theme-gradient {
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+}
+
+.text-theme-gradient {
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Common theme components that can be customized per year */
+.theme-hero {
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+}
+
+.theme-card {
+  border-left: 4px solid var(--theme-primary);
+}
+
+.theme-button {
+  background-color: var(--theme-primary);
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.theme-button:hover {
+  background-color: var(--theme-primary-600);
+  transform: translateY(-1px);
+}
+
+.theme-link {
+  color: var(--theme-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--theme-accent);
+}
+
+.theme-link:hover {
+  color: var(--theme-primary-700);
+} 

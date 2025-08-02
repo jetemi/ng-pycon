@@ -5,6 +5,13 @@
 /* Custom fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap');
 
+/* Base theming infrastructure */
+@import './themes/_base.css';
+
+/* Year-specific themes */
+@import './themes/2024.css';
+@import './themes/2025.css';
+
 /* Custom components */
 @layer components {
   .btn {
@@ -81,26 +88,6 @@
   .backdrop-blur-light {
     backdrop-filter: blur(10px);
   }
-}
-
-/* Custom styles for yearly theming */
-:root {
-  --theme-primary: theme('colors.primary.600');
-  --theme-secondary: theme('colors.secondary.600');
-  --theme-accent: theme('colors.accent.600');
-}
-
-/* Year-specific overrides can be added here or in separate files */
-[data-theme="2024"] {
-  --theme-primary: theme('colors.blue.600');
-  --theme-secondary: theme('colors.green.600');
-  --theme-accent: theme('colors.yellow.500');
-}
-
-[data-theme="2025"] {
-  --theme-primary: theme('colors.purple.600');
-  --theme-secondary: theme('colors.pink.600');
-  --theme-accent: theme('colors.orange.500');
 }
 
 /* Animation classes */

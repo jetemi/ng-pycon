@@ -13,17 +13,75 @@ Alpine.data('navigation', () => ({
 }))
 
 Alpine.data('theme', () => ({
-  currentTheme: document.documentElement.dataset.theme || '2024',
+  currentTheme: '2024', // Default theme
+  availableThemes: {
+    '2024': {
+      name: 'Tech Innovation',
+      description: 'Clean, geometric, tech-focused design',
+      colors: ['#2563eb', '#059669', '#f59e0b']
+    },
+    '2025': {
+      name: 'Creative Community', 
+      description: 'Organic, playful, community-focused design',
+      colors: ['#7c3aed', '#ec4899', '#ea580c']
+    }
+  },
+  
+  init() {
+    // Load saved theme from localStorage or use default
+    const savedTheme = localStorage.getItem('pycon-theme')
+    const urlTheme = new URLSearchParams(window.location.search).get('theme')
+    
+    if (urlTheme && this.availableThemes[urlTheme]) {
+      this.setTheme(urlTheme)
+    } else if (savedTheme && this.availableThemes[savedTheme]) {
+      this.setTheme(savedTheme)
+    } else {
+      this.setTheme('2024')
+    }
+    
+    console.log(`🎨 PyCon Nigeria ${this.currentTheme} theme loaded:`, this.availableThemes[this.currentTheme])
+  },
+  
   setTheme(theme) {
+    if (!this.availableThemes[theme]) {
+      console.warn(`Theme "${theme}" not found. Using default.`)
+      theme = '2024'
+    }
+    
+    // Add transition class for smooth theme changes
+    document.documentElement.classList.add('theme-transitioning')
+    
     this.currentTheme = theme
     document.documentElement.dataset.theme = theme
     localStorage.setItem('pycon-theme', theme)
-  },
-  init() {
-    const savedTheme = localStorage.getItem('pycon-theme')
-    if (savedTheme) {
-      this.setTheme(savedTheme)
+    
+    // Update meta theme color based on active theme
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+    if (metaThemeColor) {
+      metaThemeColor.content = this.availableThemes[theme].colors[0]
     }
+    
+    // Remove transition class after animation
+    setTimeout(() => {
+      document.documentElement.classList.remove('theme-transitioning')
+    }, 300)
+    
+    // Dispatch custom event for other components to react
+    window.dispatchEvent(new CustomEvent('themeChanged', { 
+      detail: { theme, themeData: this.availableThemes[theme] }
+    }))
+    
+    console.log(`🎨 Switched to ${this.availableThemes[theme].name} theme`)
+  },
+  
+  getThemeInfo(theme = null) {
+    return this.availableThemes[theme || this.currentTheme]
+  },
+  
+  preloadThemeAssets(theme) {
+    // Preload theme-specific assets if needed
+    console.log(`🔄 Preloading assets for ${theme} theme`)
   }
 }))
 
@@ -75,6 +133,25 @@ Alpine.start()
 
 // Custom JavaScript functions
 document.addEventListener('DOMContentLoaded', function() {
+  
+  // Add smooth theme transition CSS
+  const style = document.createElement('style')
+  style.textContent = `
+    .theme-transitioning * {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+    }
+  `
+  document.head.appendChild(style)
+  
+  // Listen for theme changes
+  window.addEventListener('themeChanged', function(event) {
+    const { theme, themeData } = event.detail
+    console.log(`🎨 Theme changed to: ${themeData.name}`)
+    
+    // Update any theme-dependent elements
+    updateThemeDependentElements(theme)
+  })
+  
   // Smooth scrolling for anchor links
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function(e) {
@@ -149,6 +226,18 @@ document.addEventListener('DOMContentLoaded', function() {
   })
 })
 
+// Update theme-dependent elements
+function updateThemeDependentElements(theme) {
+  // Update any elements that need special handling during theme changes
+  const themeElements = document.querySelectorAll('[data-theme-element]')
+  themeElements.forEach(element => {
+    element.classList.add('theme-updating')
+    setTimeout(() => {
+      element.classList.remove('theme-updating')
+    }, 300)
+  })
+}
+
 // AJAX form handler
 function handleAjaxForm(event) {
   event.preventDefault()
@@ -190,7 +279,7 @@ function handleAjaxForm(event) {
 // Notification system
 function showNotification(message, type = 'info') {
   const notification = document.createElement('div')
-  notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full`
+  notification.className = `fixed top-4 left-4 px-6 py-3 rounded-lg shadow-lg z-40 transform transition-all duration-300 translate-x-full`
   
   const colors = {
     success: 'bg-green-500 text-white',
@@ -216,6 +305,26 @@ function showNotification(message, type = 'info') {
       document.body.removeChild(notification)
     }, 300)
   }, 5000)
+}
+
+// Theme switching utility functions
+window.PyCon = {
+  // Public API for theme switching
+  switchTheme: function(theme) {
+    const themeComponent = Alpine.$data(document.querySelector('[x-data*="theme"]'))
+    if (themeComponent) {
+      themeComponent.setTheme(theme)
+    }
+  },
+  
+  getCurrentTheme: function() {
+    return document.documentElement.dataset.theme
+  },
+  
+  getAvailableThemes: function() {
+    const themeComponent = Alpine.$data(document.querySelector('[x-data*="theme"]'))
+    return themeComponent ? themeComponent.availableThemes : {}
+  }
 }
 
 // Utility functions

@@ -6,6 +6,7 @@ module.exports = {
     './home/templates/**/*.html',
     './search/templates/**/*.html',
     './pyconng/static/js/**/*.js',
+    './pyconng/static/css/src/**/*.css',
   ],
   theme: {
     extend: {
@@ -56,6 +57,8 @@ module.exports = {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.5s ease-out',
         'bounce-light': 'bounceLight 2s infinite',
+        'tech-pulse': 'techPulse 3s ease-in-out infinite',
+        'creative-float': 'creativeFloat 4s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -69,6 +72,30 @@ module.exports = {
         bounceLight: {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-10px)' },
+        },
+        techPulse: {
+          '0%, 100%': { 
+            transform: 'scale(1)',
+            boxShadow: '0 0 0 0 rgba(37, 99, 235, 0.7)'
+          },
+          '50%': { 
+            transform: 'scale(1.05)',
+            boxShadow: '0 0 0 10px rgba(37, 99, 235, 0)'
+          },
+        },
+        creativeFloat: {
+          '0%, 100%': { 
+            transform: 'translateY(0px) rotate(0deg)',
+            borderRadius: '20px'
+          },
+          '33%': { 
+            transform: 'translateY(-10px) rotate(1deg)',
+            borderRadius: '25px'
+          },
+          '66%': { 
+            transform: 'translateY(-5px) rotate(-1deg)',
+            borderRadius: '15px'
+          },
         },
       },
     },

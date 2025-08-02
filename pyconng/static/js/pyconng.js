@@ -12,8 +12,8 @@ Alpine.data('navigation', () => ({
   }
 }))
 
-Alpine.data('theme', () => ({
-  currentTheme: '2024', // Default theme
+Alpine.data('theme', (initialTheme = null) => ({
+  currentTheme: '2025', // Default theme
   availableThemes: {
     '2024': {
       name: 'Tech Innovation',
@@ -28,25 +28,44 @@ Alpine.data('theme', () => ({
   },
   
   init() {
-    // Load saved theme from localStorage or use default
+    // Get theme from URL/meta tags first, then localStorage, then default
+    const urlTheme = this.getThemeFromMeta()
     const savedTheme = localStorage.getItem('pycon-theme')
-    const urlTheme = new URLSearchParams(window.location.search).get('theme')
+    const urlParam = new URLSearchParams(window.location.search).get('theme')
     
-    if (urlTheme && this.availableThemes[urlTheme]) {
-      this.setTheme(urlTheme)
+    let themeToUse = null
+    
+    if (initialTheme && this.availableThemes[initialTheme]) {
+      // Use theme passed from template (URL-based)
+      themeToUse = initialTheme
+    } else if (urlTheme && this.availableThemes[urlTheme]) {
+      // Use theme from meta tag (URL-based year)
+      themeToUse = urlTheme
+    } else if (urlParam && this.availableThemes[urlParam]) {
+      // Use theme from URL parameter
+      themeToUse = urlParam
     } else if (savedTheme && this.availableThemes[savedTheme]) {
-      this.setTheme(savedTheme)
+      // Use saved theme (but only if no URL-based theme)
+      themeToUse = savedTheme
     } else {
-      this.setTheme('2024')
+      // Default theme
+      themeToUse = '2025'
     }
     
-    console.log(`🎨 PyCon Nigeria ${this.currentTheme} theme loaded:`, this.availableThemes[this.currentTheme])
+    this.setTheme(themeToUse)
+    
+    console.log(`🎨 PyCon Nigeria ${themeToUse} theme loaded:`, this.availableThemes[themeToUse])
+  },
+  
+  getThemeFromMeta() {
+    const meta = document.querySelector('meta[name="conference-theme"]')
+    return meta ? meta.content : null
   },
   
   setTheme(theme) {
     if (!this.availableThemes[theme]) {
       console.warn(`Theme "${theme}" not found. Using default.`)
-      theme = '2024'
+      theme = '2025'
     }
     
     // Add transition class for smooth theme changes
@@ -54,7 +73,12 @@ Alpine.data('theme', () => ({
     
     this.currentTheme = theme
     document.documentElement.dataset.theme = theme
-    localStorage.setItem('pycon-theme', theme)
+    
+    // Only save to localStorage if not URL-based theme
+    const urlTheme = this.getThemeFromMeta()
+    if (!urlTheme) {
+      localStorage.setItem('pycon-theme', theme)
+    }
     
     // Update meta theme color based on active theme
     const metaThemeColor = document.querySelector('meta[name="theme-color"]')
@@ -79,9 +103,15 @@ Alpine.data('theme', () => ({
     return this.availableThemes[theme || this.currentTheme]
   },
   
-  preloadThemeAssets(theme) {
-    // Preload theme-specific assets if needed
-    console.log(`🔄 Preloading assets for ${theme} theme`)
+  navigateToYear(year) {
+    // Navigate to different year URL
+    // For current year, go to root URL; for other years, go to year-specific URL
+    const currentYear = document.querySelector('meta[name="current-year"]')?.content
+    if (year.toString() === currentYear) {
+      window.location.href = `/`
+    } else {
+      window.location.href = `/${year}/`
+    }
   }
 }))
 
@@ -142,6 +172,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   `
   document.head.appendChild(style)
+  
+  // Get conference data from meta tags
+  const conferenceYear = document.querySelector('meta[name="conference-year"]')?.content
+  const conferenceTheme = document.querySelector('meta[name="conference-theme"]')?.content
+  const conferenceName = document.querySelector('meta[name="conference-name"]')?.content
+  
+  if (conferenceYear && conferenceTheme) {
+    console.log(`🎉 PyCon Nigeria ${conferenceYear} (${conferenceName}) - Theme: ${conferenceTheme}`)
+  }
   
   // Listen for theme changes
   window.addEventListener('themeChanged', function(event) {
@@ -317,8 +356,24 @@ window.PyCon = {
     }
   },
   
+  navigateToYear: function(year) {
+    // Navigate to different year URL
+    // For current year, go to root URL; for other years, go to year-specific URL
+    const currentYear = document.querySelector('meta[name="current-year"]')?.content
+    if (year.toString() === currentYear) {
+      window.location.href = `/`
+    } else {
+      window.location.href = `/${year}/`
+    }
+  },
+  
   getCurrentTheme: function() {
     return document.documentElement.dataset.theme
+  },
+  
+  getCurrentYear: function() {
+    const meta = document.querySelector('meta[name="conference-year"]')
+    return meta ? parseInt(meta.content) : null
   },
   
   getAvailableThemes: function() {

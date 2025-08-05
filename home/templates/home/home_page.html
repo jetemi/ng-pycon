@@ -1,21 +1,178 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static wagtailcore_tags %}
 
 {% block body_class %}template-homepage{% endblock %}
 
-{% block extra_css %}
-
-{% comment %}
-Delete the line below if you're just getting started and want to remove the welcome screen!
-{% endcomment %}
-<link rel="stylesheet" href="{% static 'css/welcome_page.css' %}">
-{% endblock extra_css %}
-
 {% block content %}
 
-{% comment %}
-Delete the line below if you're just getting started and want to remove the welcome screen!
-{% endcomment %}
-{% include 'home/welcome_page.html' %}
+<!-- Hero Section -->
+<section class="theme-hero">
+    <div class="theme-container relative z-10">
+        <div class="text-center py-20">
+            <h1 class="theme-heading">
+                {{ page.hero_title }}
+                <span class="theme-accent-text">{{ conference_year }}</span>
+            </h1>
+            {% if page.hero_subtitle %}
+            <h2 class="text-white text-2xl mb-4 theme-accent-text">{{ page.hero_subtitle }}</h2>
+            {% endif %}
+            {% if page.hero_description %}
+            <div class="text-white text-xl mb-8 max-w-2xl mx-auto">
+                {{ page.hero_description|richtext }}
+            </div>
+            {% endif %}
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                {% if page.hero_primary_button_text %}
+                <a href="{{ page.hero_primary_button_url|default:'#' }}" class="theme-button animate-tech-pulse">
+                    {{ page.hero_primary_button_text }}
+                </a>
+                {% endif %}
+                {% if page.hero_secondary_button_text %}
+                <a href="{{ page.hero_secondary_button_url|default:'#' }}" class="theme-button bg-transparent border-2 border-white text-white hover:bg-white hover:text-gray-900">
+                    {{ page.hero_secondary_button_text }}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
 
-{% endblock content %}
+<!-- Conference Info Section -->
+<section class="theme-section">
+    <div class="theme-container">
+        <div class="text-center mb-16">
+            <h2 class="theme-heading text-4xl mb-4">{{ page.conference_section_title }} {{ conference_year }}</h2>
+            <div class="max-w-3xl mx-auto">
+                <h3 class="text-2xl font-semibold mb-4 text-theme-primary">{{ conference_year_info.name }}</h3>
+                {% if page.conference_description %}
+                <div class="text-gray-600 text-lg mb-8">
+                    {{ page.conference_description|richtext }}
+                </div>
+                {% endif %}
+                
+                {% comment %}
+                Only show archive/current notices for year-specific URLs, not for root URL
+                {% endcomment %}
+                {% if is_year_specific_url %}
+                    {% if not is_current_year %}
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
+                        <p class="text-yellow-800">
+                            <strong>📅 Archive:</strong> You're viewing PyCon Nigeria {{ conference_year }}. 
+                            <a href="/" class="text-yellow-600 hover:text-yellow-800 underline">
+                                Go to Current PyCon ({{ current_year }})
+                            </a>
+                        </p>
+                    </div>
+                    {% else %}
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-8">
+                        <p class="text-green-800">
+                            <strong>🎉 Current:</strong> This is the current PyCon Nigeria {{ conference_year }} website.
+                            <a href="/" class="text-green-600 hover:text-green-800 underline">
+                                Main Website
+                            </a>
+                        </p>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Dynamic Features from Wagtail -->
+        {% if page.features %}
+        <div class="theme-grid">
+            {% for feature in page.features %}
+                {% if feature.block_type == 'feature' %}
+                <div class="theme-card animate-on-scroll">
+                    <div class="mb-4">
+                        {% if feature.value.icon_svg %}
+                        <div class="w-12 h-12 bg-theme-primary rounded-lg flex items-center justify-center mb-4">
+                            {{ feature.value.icon_svg|safe }}
+                        </div>
+                        {% else %}
+                        <div class="w-12 h-12 bg-theme-primary rounded-lg flex items-center justify-center mb-4">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        {% endif %}
+                        <h3 class="theme-heading text-xl mb-2">{{ feature.value.title }}</h3>
+                        <p class="text-gray-600">{{ feature.value.description }}</p>
+                    </div>
+                    {% if feature.value.link_text and feature.value.link_url %}
+                    <a href="{{ feature.value.link_url }}" class="theme-button w-full">{{ feature.value.link_text }}</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Year Navigation Section -->
+<section class="theme-section bg-gray-100">
+    <div class="theme-container">
+        <h2 class="theme-heading text-3xl text-center mb-12">{{ page.year_navigation_title }}</h2>
+        
+        {% if page.year_navigation_description %}
+        <div class="text-center mb-8">
+            <div class="text-gray-600 max-w-3xl mx-auto">
+                {{ page.year_navigation_description|richtext }}
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="grid md:grid-cols-2 gap-8 mb-8">
+            {% for year, info in available_years.items %}
+            <div class="bg-white rounded-lg p-6 shadow-lg {% if year == conference_year %}ring-2 ring-theme-primary{% endif %}">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="font-bold text-xl mb-2" style="color: {{ info.colors.0 }}">
+                            {{ year }}: {{ info.name }}
+                        </h3>
+                        <p class="text-gray-600 text-sm">{{ info.description }}</p>
+                    </div>
+                    {% if year == conference_year and not is_year_specific_url %}
+                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Latest</span>
+                    {% elif year == conference_year %}
+                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Viewing</span>
+                    {% endif %}
+                </div>
+                
+                <div class="flex space-x-2 mb-4">
+                    {% for color in info.colors %}
+                    <div class="w-4 h-4 rounded-full" style="background-color: {{ color }}"></div>
+                    {% endfor %}
+                </div>
+                
+                <div class="flex space-x-2">
+                    {% if year == conference_year and not is_year_specific_url %}
+                    <button class="flex-1 px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed">
+                        Current View
+                    </button>
+                    {% elif year == conference_year %}
+                    <button onclick="window.location.href = '/'" 
+                            class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                        Main Website
+                    </button>
+                    {% else %}
+                    <button onclick="window.location.href = '/{{ year }}/'" 
+                            class="flex-1 px-4 py-2 text-white rounded-lg hover:opacity-90 transition-opacity"
+                            style="background-color: {{ info.colors.0 }}">
+                        View {{ year }}
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center">
+            <div class="text-sm text-gray-500">
+                <p>🎨 Different themes • 🎯 Year-specific content • 📅 Historical archives</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

@@ -7,6 +7,7 @@ from wagtail import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
 from search import views as search_views
+from pyconng.views import year_page_serve
 
 # Current year - update this each year
 CURRENT_YEAR = '2025'
@@ -17,11 +18,10 @@ urlpatterns = [
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
     
-    # Year-specific routing
-    path("<int:year>/", include([
-        path("search/", search_views.search, name="year_search"),
-        path("", include(wagtail_urls)),
-    ])),
+    # Year-specific routing using custom view
+    path("<int:year>/search/", search_views.search, name="year_search"),
+    path("<int:year>/", year_page_serve, {'path': ''}, name="year_home"),
+    path("<int:year>/<path:path>/", year_page_serve, name="year_page"),
     
     # Root URL serves current year content directly (no redirect)
     path("", include(wagtail_urls)),

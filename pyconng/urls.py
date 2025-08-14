@@ -9,16 +9,13 @@ from wagtail.documents import urls as wagtaildocs_urls
 from search import views as search_views
 from pyconng.views import year_page_serve
 
-# Current year - update this each year
-CURRENT_YEAR = '2025'
-
 urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("admin/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
     
-    # Year-specific routing using custom view
+    # Year-specific routing using custom view. Past years are read-only snapshots.
     path("<int:year>/search/", search_views.search, name="year_search"),
     path("<int:year>/", year_page_serve, {'path': ''}, name="year_home"),
     path("<int:year>/<path:path>/", year_page_serve, name="year_page"),

@@ -17,39 +17,30 @@
         {% endif %}
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-        {# Force all links in the live preview panel to be opened in a new tab #}
         {% if request.in_preview_panel %}
         <base target="_blank">
         {% endif %}
 
-        {# Preload fonts for better performance #}
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-        {# Global stylesheets - Tailwind CSS #}
         <link rel="stylesheet" type="text/css" href="{% static 'css/pyconng.css' %}">
 
-        {% block extra_css %}
-        {# Override this in templates to add extra stylesheets #}
-        {% endblock %}
+        {% block extra_css %}{% endblock %}
 
-        {# Favicon and meta tags #}
         <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
         <meta name="theme-color" content="{{ conference_year_info.colors.0 }}">
         
-        {# Open Graph / Facebook #}
         <meta property="og:type" content="website">
         <meta property="og:title" content="{% block og_title %}{% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %} - {{ site_name }} {{ conference_year }}{% endblock %}">
         <meta property="og:description" content="{% block og_description %}{{ page.search_description|default:'PyCon Nigeria - The premier Python conference in Nigeria' }}{% endblock %}">
         <meta property="og:image" content="{% block og_image %}{% static 'images/og-image.jpg' %}{% endblock %}">
         
-        {# Twitter #}
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:title" content="{% block twitter_title %}{% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %} - {{ site_name }} {{ conference_year }}{% endblock %}">
         <meta property="twitter:description" content="{% block twitter_description %}{{ page.search_description|default:'PyCon Nigeria - The premier Python conference in Nigeria' }}{% endblock %}">
         <meta property="twitter:image" content="{% block twitter_image %}{% static 'images/og-image.jpg' %}{% endblock %}">
         
-        {# Pass conference data via data attributes #}
         <meta name="conference-year" content="{{ conference_year }}">
         <meta name="conference-theme" content="{{ conference_theme }}">
         <meta name="conference-name" content="{{ conference_year_info.name }}">
@@ -59,7 +50,6 @@
     <body class="{% block body_class %}{% endblock %} font-sans antialiased bg-gray-50 text-gray-900">
         {% wagtailuserbar %}
 
-        {# Year/Theme Switcher - shows all available years #}
         <div class="fixed top-4 right-4 z-50" x-data="theme('{{ conference_theme }}')">
             <div class="bg-white rounded-lg shadow-lg p-3 border border-gray-200">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Conference Year:</label>
@@ -84,28 +74,9 @@
 
         {% block content %}{% endblock %}
 
-        {# Global javascript - Alpine.js first, then custom scripts #}
         <script defer src="{% static 'js/alpine.min.js' %}"></script>
         <script type="module" src="{% static 'js/pyconng.js' %}"></script>
 
-        {% block extra_js %}
-        {# Override this in templates to add extra javascript #}
-        {% endblock %}
-
-        {# Development helpers #}
-        {% if debug %}
-        <script>
-            console.log('🎨 PyCon Nigeria {{ conference_year }} ({{ conference_year_info.name }}) loaded');
-            // Live reload for development
-            if (typeof EventSource !== 'undefined') {
-                var source = new EventSource('/dev/reload/');
-                source.onmessage = function(event) {
-                    if (event.data === 'reload') {
-                        location.reload();
-                    }
-                };
-            }
-        </script>
-        {% endif %}
+        {% block extra_js %}{% endblock %}
     </body>
 </html>

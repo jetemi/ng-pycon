@@ -9,6 +9,7 @@ A PyCon Nigeria conference management platform built with Wagtail CMS and Django
 - **Wagtail CMS**: Flexible content management system
 - **Modern Frontend**: Tailwind CSS + Alpine.js for responsive and interactive UI
 - **Docker Support**: Containerized development environment
+- **Content Management**: All content managed through Wagtail admin (no hardcoded content)
 
 ## Tech Stack
 
@@ -82,6 +83,50 @@ A PyCon Nigeria conference management platform built with Wagtail CMS and Django
    - Website: http://localhost:8000
    - Wagtail Admin: http://localhost:8000/admin
 
+## Content Management
+
+### Wagtail CMS Approach
+This project follows Wagtail CMS best practices:
+- **No hardcoded content** - All content is managed through the admin interface
+- **StreamField blocks** - Flexible, reusable content components
+- **Rich text fields** - WYSIWYG editing for formatted content
+- **Admin panels** - Organized content editing interface
+
+### Managing Content
+
+1. **Access Admin**: Go to `http://localhost:8000/admin` and log in
+2. **Edit Home Page**: Navigate to Pages → Home to edit:
+   - **Hero Section**: Title, subtitle, description, call-to-action buttons
+   - **Conference Info**: Section title and description
+   - **Feature Cards**: Add/remove/reorder feature cards with icons, titles, descriptions, and links
+   - **Year Navigation**: Customize section title and description
+
+3. **Adding Feature Cards**:
+   - Click "Add feature" in the Features section
+   - Add title and description (required)
+   - Optionally add SVG icon code and link
+   - Save and publish
+
+### Content Structure
+
+```
+Home Page Fields:
+├── Hero Section
+│   ├── Title (CharField)
+│   ├── Subtitle (CharField, optional)
+│   ├── Description (RichTextField)
+│   ├── Primary Button (text + URL)
+│   └── Secondary Button (text + URL)
+├── Conference Info
+│   ├── Section Title (CharField)
+│   └── Description (RichTextField)
+├── Features (StreamField)
+│   └── Feature Cards (title, description, icon, link)
+└── Year Navigation
+    ├── Section Title (CharField)
+    └── Description (RichTextField)
+```
+
 ## Development
 
 ### Frontend Development
@@ -95,6 +140,26 @@ A PyCon Nigeria conference management platform built with Wagtail CMS and Django
 - **Custom applications**: Place in `pyconng/apps/`
 - **Templates**: Located in `pyconng/templates/`
 - **Static files**: Located in `pyconng/static/`
+- **Content management**: All content via Wagtail admin
+
+### Adding New Content Types
+
+1. **Create models** in your app with Wagtail fields
+2. **Define content panels** for the admin interface
+3. **Create templates** that use the model fields
+4. **Run migrations** to update the database
+
+Example:
+```python
+class EventPage(Page):
+    description = RichTextField()
+    date = models.DateField()
+    
+    content_panels = Page.content_panels + [
+        FieldPanel('description'),
+        FieldPanel('date'),
+    ]
+```
 
 ### Yearly Theming System
 
@@ -130,6 +195,7 @@ The theming system uses CSS custom properties and data attributes:
 │   │       ├── pyconng.js  # Custom JavaScript
 │   │       └── alpine.min.js # Alpine.js
 │   └── templates/         # Django templates
+├── home/                  # Home page app with Wagtail models
 ├── scripts/               # Development scripts
 ├── docker-compose.yml     # Docker services
 ├── Dockerfile            # Multi-stage build
@@ -137,6 +203,13 @@ The theming system uses CSS custom properties and data attributes:
 ├── tailwind.config.js    # Tailwind CSS configuration
 └── postcss.config.js     # PostCSS configuration
 ```
+
+## URL Structure
+
+- **`/`** → Current year (2025) with latest design
+- **`/2024/`** → 2024 conference with tech theme
+- **`/2025/`** → 2025 conference with creative theme
+- **`/admin/`** → Wagtail admin interface
 
 ## Docker Services
 

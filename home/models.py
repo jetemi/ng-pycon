@@ -79,6 +79,13 @@ class HomePage(Page):
         help_text="Description for the year navigation section"
     )
 
+    # Limit allowed child types and set default child class
+    subpage_types = ["home.StandardPage"]
+
+    def get_default_child_class(self):
+        from .models import StandardPage
+        return StandardPage
+
     content_panels = Page.content_panels + [
         MultiFieldPanel([
             FieldPanel('hero_title'),
@@ -105,3 +112,24 @@ class HomePage(Page):
 
     class Meta:
         verbose_name = "Home Page"
+
+
+class StandardPage(Page):
+    """A generic, reusable content page for most site pages."""
+    intro = RichTextField(blank=True)
+    body = StreamField([
+        ("heading", blocks.CharBlock(form_classname="full title")),
+        ("paragraph", blocks.RichTextBlock()),
+        ("image", ImageChooserBlock()),
+    ], blank=True, use_json_field=True)
+
+    parent_page_types = ["home.HomePage", "home.StandardPage"]
+    subpage_types = ["home.StandardPage"]
+
+    content_panels = Page.content_panels + [
+        FieldPanel("intro"),
+        FieldPanel("body"),
+    ]
+
+    class Meta:
+        verbose_name = "Standard Page"

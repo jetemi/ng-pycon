@@ -79,6 +79,35 @@ class FooterLinkBlock(blocks.StructBlock):
 
 
 class HomePage(Page):
+    """
+    Home page for PyCon Nigeria conference.
+    Can be used for both current year (at root /) and archived years (at /2024/, /2025/, etc.)
+    Each instance can have its own theme/design.
+    """
+    
+    # Conference Year & Theme
+    conference_year = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="The conference year this page represents (e.g., 2024, 2025). Leave blank for current year."
+    )
+    
+    # Theme/Design selection
+    THEME_CHOICES = [
+        ('default', 'Default Theme (current design)'),
+        ('theme_2024', '2024 Theme'),
+        ('theme_2025', '2025 Theme'),
+        ('theme_2026', '2026 Theme'),
+        ('theme_legacy', 'Legacy Theme'),
+    ]
+    
+    theme = models.CharField(
+        max_length=50,
+        choices=THEME_CHOICES,
+        default='default',
+        help_text="Select the design/theme for this conference year"
+    )
+    
     # Hero Section
     hero_title = models.CharField(
         max_length=200, 
@@ -242,14 +271,45 @@ class HomePage(Page):
         help_text="Newsletter description"
     )
 
-    # Limit allowed child types and set default child class
-    subpage_types = ["home.StandardPage"]
+    # Allow HomePage to be nested (for archived years) and have standard pages as children
+    parent_page_types = ["wagtailcore.Page", "home.HomePage"]  # Can be root or child of another HomePage
+    subpage_types = ["home.StandardPage", "home.HomePage"]  # Can have standard pages and other year homepages
 
     def get_default_child_class(self):
         from .models import StandardPage
         return StandardPage
+    
+    def get_template(self, request, *args, **kwargs):
+        """
+        Dynamically select template based on the chosen theme.
+        This allows different conference years to have completely different designs.
+        """
+        theme_templates = {
+            'default': 'home/home_page.html',
+            'theme_2024': 'home/themes/theme_2024.html',
+            'theme_2025': 'home/themes/theme_2025.html',
+            'theme_2026': 'home/themes/theme_2026.html',
+            'theme_legacy': 'home/themes/theme_legacy.html',
+        }
+        return theme_templates.get(self.theme, 'home/home_page.html')
+    
+    def save(self, *args, **kwargs):
+        """Auto-set slug and title based on conference year if specified."""
+        if self.conference_year:
+            # For archived years, set slug to the year
+            if not self.slug or self.slug == 'home':
+                self.slug = str(self.conference_year)
+            # Auto-set title if not customized
+            if not self.title or self.title == "Home":
+                self.title = f"PyCon Nigeria {self.conference_year}"
+        return super().save(*args, **kwargs)
 
     content_panels = Page.content_panels + [
+        MultiFieldPanel([
+            FieldPanel('conference_year'),
+            FieldPanel('theme'),
+        ], heading="Conference Year & Theme"),
+        
         MultiFieldPanel([
             FieldPanel('hero_title'),
             FieldPanel('hero_subtitle'),
@@ -353,3 +413,5 @@ class StandardPage(Page):
 
     class Meta:
         verbose_name = "Standard Page"
+
+

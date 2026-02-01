@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags %}
+
+{% comment %}
+Legacy Theme - A simplified, classic design for older archived years.
+This theme uses a more traditional, minimalist approach suitable for 
+conferences from several years ago.
+{% endcomment %}
+
+{% block body_class %}template-yeararchivepage theme-legacy{% endblock %}
+
+{% block extra_css %}
+<!-- Legacy Theme Stylesheet -->
+<link rel="stylesheet" href="{% static 'css/themes/theme-legacy.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<!-- Legacy Theme JavaScript -->
+<script src="{% static 'js/themes/theme-legacy.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- Archive Notice Banner -->
+    <div class="header-banner">
+        🗃️ ARCHIVED EVENT - {{ page.archive_year }}
+    </div>
+    
+    <!-- Hero Section -->
+    <div class="hero-classic">
+        <h1>{{ page.hero_title }}</h1>
+        
+        {% if page.hero_subtitle %}
+        <p style="font-size: 1.5rem; margin-bottom: 1rem;">
+            {{ page.hero_subtitle }}
+        </p>
+        {% endif %}
+        
+        {% if page.conference_dates or page.conference_location %}
+        <p style="font-size: 1.2rem; margin-bottom: 2rem;">
+            {% if page.conference_dates %}
+                {{ page.conference_dates }}
+            {% endif %}
+            {% if page.conference_location %}
+                {% if page.conference_dates %} | {% endif %}
+                {{ page.conference_location }}
+            {% endif %}
+        </p>
+        {% endif %}
+        
+        {% if page.hero_description %}
+        <div style="font-size: 1.1rem; max-width: 700px; margin: 0 auto 2rem auto;">
+            {{ page.hero_description|richtext }}
+        </div>
+        {% endif %}
+        
+        {% if page.hero_primary_button_url %}
+        <a href="{{ page.hero_primary_button_url }}" class="btn-classic">
+            {{ page.hero_primary_button_text }}
+        </a>
+        {% endif %}
+        
+        {% if page.hero_secondary_button_url %}
+        <a href="{{ page.hero_secondary_button_url }}" class="btn-classic btn-secondary">
+            {{ page.hero_secondary_button_text }}
+        </a>
+        {% endif %}
+    </div>
+    
+    <!-- Archive Notice -->
+    <div class="section">
+        <div class="archive-notice">
+            ⚠️ This page contains archived information from PyCon Nigeria {{ page.archive_year }}.
+            For current conference details, please visit <a href="/" style="color: #2c3e50; text-decoration: underline;">the main website</a>.
+        </div>
+    </div>
+    
+    <!-- Conference Information -->
+    {% if page.conference_description or page.features %}
+    <div class="section">
+        {% if page.conference_section_title %}
+        <h2>{{ page.conference_section_title }}</h2>
+        {% endif %}
+        
+        {% if page.conference_description %}
+        <div style="margin-bottom: 2rem; line-height: 1.6;">
+            {{ page.conference_description|richtext }}
+        </div>
+        {% endif %}
+        
+        <!-- Features -->
+        {% if page.features %}
+        <div>
+            {% for block in page.features %}
+            <div class="feature-box">
+                <h3>{{ block.value.title }}</h3>
+                <p>{{ block.value.description }}</p>
+                {% if block.value.link_url %}
+                <a href="{{ block.value.link_url }}" style="color: #e74c3c; font-weight: bold;">
+                    {{ block.value.link_text|default:"Read more" }} →
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <!-- Sponsors (if any) -->
+    {% if page.sponsors %}
+    <div class="section">
+        {% if page.sponsor_section_title %}
+        <h2>{{ page.sponsor_section_title }}</h2>
+        {% endif %}
+        <div style="text-align: center;">
+            {% for block in page.sponsors %}
+            <div style="display: inline-block; margin: 1rem; padding: 1rem;">
+                {% if block.value.logo %}
+                <img src="{{ block.value.logo.file.url }}" 
+                     alt="{{ block.value.name }}"
+                     style="max-width: 200px; max-height: 100px;">
+                {% endif %}
+                <p style="margin-top: 0.5rem;">
+                    <strong>{{ block.value.name }}</strong><br>
+                    <small style="color: #7f8c8d;">{{ block.value.get_tier_display }}</small>
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Footer -->
+    <div class="footer-classic">
+        <p>{{ page.footer_copyright }}</p>
+        <p style="margin-top: 1rem;">
+            <a href="/" style="color: #ecf0f1; text-decoration: underline;">
+                Return to Current Conference
+            </a>
+        </p>
+    </div>
+</div>
+{% endblock %}

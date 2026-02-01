@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags %}
+
+{% comment %}
+This is an example theme template for the 2024 archived year.
+You can customize this template to have a completely different design/layout
+while still using the same content fields from YearArchivePage.
+
+This demonstrates how each archived year can have its own unique design.
+{% endcomment %}
+
+{% block body_class %}template-yeararchivepage theme-2024{% endblock %}
+
+{% block extra_css %}
+<!-- 2024 Theme Stylesheet -->
+<link rel="stylesheet" href="{% static 'css/themes/theme-2024.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<!-- 2024 Theme JavaScript -->
+<script src="{% static 'js/themes/theme-2024.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+<!-- Archive Badge to indicate this is an archived year -->
+<div class="archive-badge">
+    📅 {{ page.archive_year }} Archive
+</div>
+
+<!-- Hero Section (2024 Design) -->
+<section class="hero-section min-h-screen flex items-center justify-center text-white px-4">
+    <div class="max-w-5xl mx-auto text-center">
+        <h1 class="text-5xl md:text-7xl font-bold mb-6">
+            {{ page.hero_title }}
+        </h1>
+        
+        {% if page.hero_subtitle %}
+        <p class="text-2xl md:text-3xl mb-4 text-blue-100">
+            {{ page.hero_subtitle }}
+        </p>
+        {% endif %}
+        
+        {% if page.conference_dates or page.conference_location %}
+        <div class="text-xl mb-8 text-blue-50">
+            {% if page.conference_dates %}
+                <span class="mr-4">📅 {{ page.conference_dates }}</span>
+            {% endif %}
+            {% if page.conference_location %}
+                <span>📍 {{ page.conference_location }}</span>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% if page.hero_description %}
+        <div class="text-lg mb-8 max-w-3xl mx-auto text-blue-50">
+            {{ page.hero_description|richtext }}
+        </div>
+        {% endif %}
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            {% if page.hero_primary_button_url %}
+            <a href="{{ page.hero_primary_button_url }}" 
+               class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                {{ page.hero_primary_button_text }}
+            </a>
+            {% endif %}
+            
+            {% if page.hero_secondary_button_url %}
+            <a href="{{ page.hero_secondary_button_url }}" 
+               class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
+                {{ page.hero_secondary_button_text }}
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Conference Info Section -->
+{% if page.conference_description or page.features %}
+<section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4">
+        {% if page.conference_section_title %}
+        <h2 class="text-4xl font-bold text-center mb-12">
+            {{ page.conference_section_title }}
+        </h2>
+        {% endif %}
+        
+        {% if page.conference_description %}
+        <div class="text-lg mb-12 max-w-4xl mx-auto text-center text-gray-700">
+            {{ page.conference_description|richtext }}
+        </div>
+        {% endif %}
+        
+        <!-- Features Grid (2024 Style - Different from default) -->
+        {% if page.features %}
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for block in page.features %}
+                <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-shadow">
+                    {% if block.value.icon_svg %}
+                    <div class="mb-4">
+                        {{ block.value.icon_svg|safe }}
+                    </div>
+                    {% endif %}
+                    <h3 class="text-2xl font-bold mb-4 text-blue-600">
+                        {{ block.value.title }}
+                    </h3>
+                    <p class="text-gray-600 mb-4">
+                        {{ block.value.description }}
+                    </p>
+                    {% if block.value.link_url %}
+                    <a href="{{ block.value.link_url }}" class="text-blue-600 hover:text-blue-800 font-semibold">
+                        {{ block.value.link_text|default:"Learn More" }} →
+                    </a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Additional sections can be added here following the 2024 design pattern -->
+<!-- Tickets, Sponsors, etc. with custom 2024 styling -->
+
+<!-- Footer Note -->
+<section class="bg-gray-900 text-white py-8">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+        <p class="text-gray-400">
+            This is an archived page for PyCon Nigeria {{ page.archive_year }}.
+            For the current conference, visit <a href="/" class="text-blue-400 hover:text-blue-300">the homepage</a>.
+        </p>
+    </div>
+</section>
+
+{% endblock %}

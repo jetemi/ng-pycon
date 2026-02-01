@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags %}
+
+{% comment %}
+2025 Theme Template
+This is a placeholder for a custom 2025 design.
+You can customize this to match the specific branding/design for 2025.
+{% endcomment %}
+
+{% block body_class %}template-yeararchivepage theme-2025{% endblock %}
+
+{% block extra_css %}
+<!-- 2025 Theme Stylesheet -->
+<link rel="stylesheet" href="{% static 'css/themes/theme-2025.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<!-- 2025 Theme JavaScript -->
+<script src="{% static 'js/themes/theme-2025.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+<!-- Archive Indicator -->
+<div class="archive-indicator">
+    📦 Viewing {{ page.archive_year }} Archive | <a href="/" style="color: white; text-decoration: underline;">Go to Current Year</a>
+</div>
+
+<!-- Hero Section -->
+<section class="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-500 to-indigo-600 text-white px-4">
+    <div class="max-w-6xl mx-auto text-center">
+        <h1 class="text-6xl md:text-8xl font-black mb-6">
+            {{ page.hero_title }}
+        </h1>
+        
+        {% if page.hero_subtitle %}
+        <p class="text-2xl md:text-4xl mb-4 font-light">
+            {{ page.hero_subtitle }}
+        </p>
+        {% endif %}
+        
+        {% if page.conference_dates or page.conference_location %}
+        <div class="text-xl mb-8 opacity-90">
+            {% if page.conference_dates %}
+                <span class="mr-6">🗓️ {{ page.conference_dates }}</span>
+            {% endif %}
+            {% if page.conference_location %}
+                <span>🌍 {{ page.conference_location }}</span>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% if page.hero_description %}
+        <div class="text-lg mb-10 max-w-4xl mx-auto opacity-95">
+            {{ page.hero_description|richtext }}
+        </div>
+        {% endif %}
+        
+        <div class="flex flex-wrap gap-4 justify-center">
+            {% if page.hero_primary_button_url %}
+            <a href="{{ page.hero_primary_button_url }}" 
+               class="bg-amber-500 text-white px-10 py-5 rounded-full font-bold text-lg hover:bg-amber-400 transition-all transform hover:scale-105">
+                {{ page.hero_primary_button_text }}
+            </a>
+            {% endif %}
+            
+            {% if page.hero_secondary_button_url %}
+            <a href="{{ page.hero_secondary_button_url }}" 
+               class="bg-white bg-opacity-20 backdrop-blur text-white px-10 py-5 rounded-full font-bold text-lg hover:bg-opacity-30 transition-all border-2 border-white">
+                {{ page.hero_secondary_button_text }}
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Conference Info Section -->
+{% if page.conference_description or page.features %}
+<section class="py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-4">
+        {% if page.conference_section_title %}
+        <h2 class="text-5xl font-black text-center mb-16 text-gray-900">
+            {{ page.conference_section_title }}
+        </h2>
+        {% endif %}
+        
+        {% if page.conference_description %}
+        <div class="text-xl mb-16 max-w-4xl mx-auto text-gray-700 leading-relaxed">
+            {{ page.conference_description|richtext }}
+        </div>
+        {% endif %}
+        
+        <!-- Features with 2025 styling -->
+        {% if page.features %}
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {% for block in page.features %}
+                <div class="group p-8 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 hover:from-emerald-50 hover:to-indigo-50 transition-all duration-300 hover:shadow-2xl transform hover:-translate-y-2">
+                    {% if block.value.icon_svg %}
+                    <div class="mb-6 text-emerald-600">
+                        {{ block.value.icon_svg|safe }}
+                    </div>
+                    {% endif %}
+                    <h3 class="text-2xl font-bold mb-4 text-gray-900 group-hover:text-emerald-600 transition-colors">
+                        {{ block.value.title }}
+                    </h3>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        {{ block.value.description }}
+                    </p>
+                    {% if block.value.link_url %}
+                    <a href="{{ block.value.link_url }}" 
+                       class="inline-flex items-center text-emerald-600 hover:text-emerald-700 font-bold group">
+                        {{ block.value.link_text|default:"Explore" }}
+                        <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                        </svg>
+                    </a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Footer with Archive Note -->
+<footer class="bg-gray-900 text-white py-12">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-6">
+            <p class="text-2xl font-bold mb-2">PyCon Nigeria {{ page.archive_year }}</p>
+            <p class="text-gray-400 text-lg">
+                This is an archived conference page.
+            </p>
+        </div>
+        <div class="text-center">
+            <a href="/" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+                Visit Current Conference →
+            </a>
+        </div>
+        <div class="text-center mt-8 text-gray-500 text-sm">
+            {{ page.footer_copyright }}
+        </div>
+    </div>
+</footer>
+
+{% endblock %}

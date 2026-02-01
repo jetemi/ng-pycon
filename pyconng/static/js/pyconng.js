@@ -13,7 +13,7 @@ Alpine.data('navigation', () => ({
 }))
 
 Alpine.data('theme', (initialTheme = null) => ({
-  currentTheme: '2025', // Default theme
+  currentTheme: '2026', // Default theme
   availableThemes: {
     '2024': {
       name: 'Tech Innovation',
@@ -24,6 +24,11 @@ Alpine.data('theme', (initialTheme = null) => ({
       name: 'Creative Community', 
       description: 'Organic, playful, community-focused design',
       colors: ['#7c3aed', '#ec4899', '#ea580c']
+    },
+    '2026': {
+      name: 'Future Forward',
+      description: 'Clean, modern, professional, forward-looking design',
+      colors: ['#14b8a6', '#3b82f6', '#f97316']
     }
   },
   
@@ -49,7 +54,7 @@ Alpine.data('theme', (initialTheme = null) => ({
       themeToUse = savedTheme
     } else {
       // Default theme
-      themeToUse = '2025'
+      themeToUse = '2026'
     }
     
     this.setTheme(themeToUse)
@@ -65,7 +70,7 @@ Alpine.data('theme', (initialTheme = null) => ({
   setTheme(theme) {
     if (!this.availableThemes[theme]) {
       console.warn(`Theme "${theme}" not found. Using default.`)
-      theme = '2025'
+      theme = '2026'
     }
     
     // Add transition class for smooth theme changes
@@ -226,7 +231,11 @@ document.addEventListener('DOMContentLoaded', function() {
   // Form enhancements
   const forms = document.querySelectorAll('form[data-ajax="true"]')
   forms.forEach(form => {
-    form.addEventListener('submit', handleAjaxForm)
+    if (form.id === 'newsletter-form') {
+      form.addEventListener('submit', handleNewsletterForm)
+    } else {
+      form.addEventListener('submit', handleAjaxForm)
+    }
   })
 
   // Lazy loading for images
@@ -274,6 +283,71 @@ function updateThemeDependentElements(theme) {
     setTimeout(() => {
       element.classList.remove('theme-updating')
     }, 300)
+  })
+}
+
+// Newsletter form handler (sends JSON)
+function handleNewsletterForm(event) {
+  event.preventDefault()
+  const form = event.target
+  const emailInput = form.querySelector('#newsletter-email')
+  const email = emailInput.value.trim()
+  const submitBtn = form.querySelector('[type="submit"]')
+  const messageDiv = document.getElementById('newsletter-message')
+  
+  if (!email) {
+    if (messageDiv) {
+      messageDiv.textContent = 'Please enter an email address.'
+      messageDiv.className = 'mt-2 text-sm text-red-300'
+    }
+    return
+  }
+  
+  // Show loading state
+  const originalText = submitBtn.textContent
+  submitBtn.textContent = 'Submitting...'
+  submitBtn.disabled = true
+  if (messageDiv) {
+    messageDiv.textContent = ''
+    messageDiv.className = 'mt-2 text-sm'
+  }
+  
+  fetch(form.action, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCookie('csrftoken')
+    },
+    body: JSON.stringify({ email: email })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      showNotification(data.message, 'success')
+      form.reset()
+      if (messageDiv) {
+        messageDiv.textContent = data.message
+        messageDiv.className = 'mt-2 text-sm text-green-300'
+      }
+    } else {
+      showNotification(data.message || 'An error occurred', 'error')
+      if (messageDiv) {
+        messageDiv.textContent = data.message || 'An error occurred'
+        messageDiv.className = 'mt-2 text-sm text-red-300'
+      }
+    }
+  })
+  .catch(error => {
+    const errorMsg = 'An error occurred. Please try again.'
+    showNotification(errorMsg, 'error')
+    if (messageDiv) {
+      messageDiv.textContent = errorMsg
+      messageDiv.className = 'mt-2 text-sm text-red-300'
+    }
+  })
+  .finally(() => {
+    submitBtn.textContent = originalText
+    submitBtn.disabled = false
   })
 }
 

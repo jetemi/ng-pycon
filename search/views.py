@@ -11,7 +11,7 @@ from wagtail.models import Page
 # from wagtail.contrib.search_promotions.models import Query
 
 
-def search(request):
+def search(request, year=None):
     search_query = request.GET.get("query", None)
     page = request.GET.get("page", 1)
 

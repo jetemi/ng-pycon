@@ -9,7 +9,13 @@
     "dev": "concurrently \"npm run build-css\" \"python manage.py runserver\"",
     "build": "npm run build-css-prod"
   },
-  "keywords": ["django", "wagtail", "conference", "tailwind", "alpine"],
+  "keywords": [
+    "django",
+    "wagtail",
+    "conference",
+    "tailwind",
+    "alpine"
+  ],
   "author": "PyCon Nigeria",
   "license": "MIT",
   "devDependencies": {
@@ -23,4 +29,4 @@
   "dependencies": {
     "alpinejs": "^3.13.3"
   }
-} 
+}

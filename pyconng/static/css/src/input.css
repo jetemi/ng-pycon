@@ -11,6 +11,7 @@
 /* Year-specific themes */
 @import './themes/2024.css';
 @import './themes/2025.css';
+@import './themes/2026.css';
 
 /* Custom components */
 @layer components {

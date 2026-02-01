@@ -18,11 +18,18 @@ CONFERENCE_YEARS = {
         'name': 'Creative Community',
         'description': 'Organic, playful, community-focused design',
         'colors': ['#7c3aed', '#ec4899', '#ea580c'],
+        'is_current': False,
+    },
+    2026: {
+        'theme': '2026', 
+        'name': 'Future Forward',
+        'description': 'Clean, modern, professional, forward-looking design',
+        'colors': ['#14b8a6', '#3b82f6', '#f97316'],
         'is_current': True,
     }
 }
 
-CURRENT_YEAR = 2025
+CURRENT_YEAR = 2026
 DEFAULT_YEAR = CURRENT_YEAR
 
 def conference_context(request):

@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block body_class %}template-signup{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md mx-auto">
+        <div class="bg-white rounded-lg shadow-md p-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6 text-center">Sign Up</h1>
+            
+            <p class="text-sm text-gray-600 mb-6 text-center">
+                Already have an account? <a href="{% url 'login' %}" class="text-theme-primary hover:underline">Then please sign in.</a>
+            </p>
+            
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+                
+                <!-- Email Field -->
+                <div>
+                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.email.label }}
+                    </label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Legal Name Field -->
+                <div>
+                    <label for="{{ form.legal_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.legal_name.label }}
+                    </label>
+                    {{ form.legal_name }}
+                    {% if form.legal_name.help_text %}
+                    <p class="mt-1 text-xs text-gray-500">{{ form.legal_name.help_text }}</p>
+                    {% endif %}
+                    {% if form.legal_name.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.legal_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Nickname Field -->
+                <div>
+                    <label for="{{ form.nickname.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.nickname.label }}
+                    </label>
+                    {{ form.nickname }}
+                    {% if form.nickname.help_text %}
+                    <p class="mt-1 text-xs text-gray-500">{{ form.nickname.help_text }}</p>
+                    {% endif %}
+                    {% if form.nickname.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.nickname.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Newsletter Subscriptions -->
+                <div class="space-y-3">
+                    <div class="flex items-start">
+                        {{ form.subscribe_pycon_newsletter }}
+                        <div class="ml-3">
+                            <label for="{{ form.subscribe_pycon_newsletter.id_for_label }}" class="text-sm font-medium text-gray-700">
+                                {{ form.subscribe_pycon_newsletter.label }}
+                            </label>
+                            {% if form.subscribe_pycon_newsletter.help_text %}
+                            <p class="text-xs text-gray-500 mt-1">{{ form.subscribe_pycon_newsletter.help_text }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        {{ form.subscribe_psf_newsletter }}
+                        <div class="ml-3">
+                            <label for="{{ form.subscribe_psf_newsletter.id_for_label }}" class="text-sm font-medium text-gray-700">
+                                {{ form.subscribe_psf_newsletter.label }}
+                            </label>
+                            {% if form.subscribe_psf_newsletter.help_text %}
+                            <p class="text-xs text-gray-500 mt-1">{{ form.subscribe_psf_newsletter.help_text }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Password Field -->
+                <div>
+                    <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.password1.label }}
+                    </label>
+                    {{ form.password1 }}
+                    {% if form.password1.help_text %}
+                    <p class="mt-1 text-xs text-gray-500">{{ form.password1.help_text }}</p>
+                    {% endif %}
+                    {% if form.password1.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.password1.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Password Confirmation Field -->
+                <div>
+                    <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.password2.label }}
+                    </label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.password2.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <button type="submit" class="w-full theme-button py-3 text-lg">
+                    Sign Up
+                </button>
+            </form>
+            
+            <!-- Optional: Third-party authentication section -->
+            <!--
+            <div class="mt-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">Or use a third-party</span>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button type="button" class="w-full flex justify-center items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        <span>Discord</span>
+                    </button>
+                </div>
+            </div>
+            -->
+        </div>
+    </div>
+</div>
+{% endblock %}

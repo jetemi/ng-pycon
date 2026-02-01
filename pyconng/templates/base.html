@@ -50,7 +50,84 @@
     <body class="{% block body_class %}{% endblock %} font-sans antialiased bg-gray-50 text-gray-900">
         {% wagtailuserbar %}
 
-        <div class="fixed top-4 right-4 z-50" x-data="theme('{{ conference_theme }}')">
+        {% block header %}
+        <header class="theme-nav" x-data="navigation()">
+            <div class="theme-container">
+                <nav class="flex items-center justify-between py-4">
+                    <div class="flex items-center">
+                        <a href="/" class="text-2xl font-bold text-theme-primary">
+                            {{ site_name }}
+                        </a>
+                    </div>
+                    
+                    <div class="hidden md:flex items-center space-x-6">
+                        {% if page and page.navigation_menu_items %}
+                            {% for item in page.navigation_menu_items %}
+                                {% if item.block_type == 'menu_item' %}
+                                <a href="{{ item.value.link_url }}" class="theme-nav-link">
+                                    {{ item.value.label }}
+                                </a>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <a href="/" class="theme-nav-link">Home</a>
+                            <a href="/tickets/" class="theme-nav-link">Tickets</a>
+                            <a href="/schedule/" class="theme-nav-link">Schedule</a>
+                            <a href="/speakers/" class="theme-nav-link">Speakers</a>
+                            <a href="/sponsors/" class="theme-nav-link">Sponsors</a>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'logout' %}" class="theme-nav-link">Sign Out</a>
+                        {% else %}
+                        <a href="{% url 'signup' %}" class="theme-nav-link">Sign Up</a>
+                        <a href="{% url 'login' %}" class="theme-button">
+                            Sign In
+                        </a>
+                        {% endif %}
+                        
+                        <button @click="toggle()" class="md:hidden text-theme-primary focus:outline-none">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </nav>
+                
+                <div x-show="isOpen" @click.away="close()" x-transition class="md:hidden pb-4">
+                    <div class="flex flex-col space-y-2">
+                        {% if page and page.navigation_menu_items %}
+                            {% for item in page.navigation_menu_items %}
+                                {% if item.block_type == 'menu_item' %}
+                                <a href="{{ item.value.link_url }}" class="theme-nav-link block">
+                                    {{ item.value.label }}
+                                </a>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <a href="/" class="theme-nav-link block">Home</a>
+                            <a href="/tickets/" class="theme-nav-link block">Tickets</a>
+                            <a href="/schedule/" class="theme-nav-link block">Schedule</a>
+                            <a href="/speakers/" class="theme-nav-link block">Speakers</a>
+                            <a href="/sponsors/" class="theme-nav-link block">Sponsors</a>
+                        {% endif %}
+                        <div class="pt-4 border-t border-gray-200 mt-2">
+                            {% if user.is_authenticated %}
+                            <a href="{% url 'logout' %}" class="theme-nav-link block">Sign Out</a>
+                            {% else %}
+                            <a href="{% url 'signup' %}" class="theme-nav-link block">Sign Up</a>
+                            <a href="{% url 'login' %}" class="theme-button block text-center mt-2">Sign In</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        {% endblock %}
+
+        <!-- <div class="fixed top-4 right-4 z-50" x-data="theme('{{ conference_theme }}')">
             <div class="bg-white rounded-lg shadow-lg p-3 border border-gray-200">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Conference Year:</label>
                 <select onchange="
@@ -70,9 +147,11 @@
                     {{ conference_year_info.description }}
                 </div>
             </div>
-        </div>
+        </div> -->
 
         {% block content %}{% endblock %}
+
+        {% block footer %}{% endblock %}
 
         <script defer src="{% static 'js/alpine.min.js' %}"></script>
         <script type="module" src="{% static 'js/pyconng.js' %}"></script>

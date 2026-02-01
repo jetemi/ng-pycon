@@ -1,34 +1,127 @@
 {% extends "base.html" %}
-{% load static wagtailcore_tags %}
+{% load static wagtailcore_tags wagtailimages_tags %}
 
 {% block body_class %}template-homepage{% endblock %}
 
 {% block content %}
 
-<section class="theme-hero">
+<section class="theme-hero relative overflow-hidden">
     <div class="theme-container relative z-10">
-        <div class="text-center py-20">
-            <h1 class="theme-heading">
-                {{ page.hero_title }}
-                <span class="theme-accent-text">{{ conference_year }}</span>
+        <div class="text-center py-24 md:py-32">
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+                {{ page.hero_title }} {{ conference_year }}
             </h1>
-            {% if page.hero_subtitle %}
-            <h2 class="text-white text-2xl mb-4 theme-accent-text">{{ page.hero_subtitle }}</h2>
+            {% if page.conference_location or page.conference_dates %}
+            <div class="text-white text-xl md:text-2xl mb-6 font-medium">
+                {% if page.conference_location %}{{ page.conference_location }}{% endif %}{% if page.conference_location and page.conference_dates %}<br>{% endif %}{% if page.conference_dates %}{{ page.conference_dates }}{% endif %}
+            </div>
             {% endif %}
+            
+            {% if page.voting_deadline %}
+            <div class="mb-8" x-data="countdown('{{ page.voting_deadline|date:"c" }}')">
+                <p class="text-white text-lg mb-4 font-semibold">Countdown to {{ page.hero_title }} {{ conference_year }}</p>
+                <div class="flex justify-center space-x-4 md:space-x-6">
+                    <div class="bg-white/20 backdrop-blur-sm rounded-lg p-4 md:p-6 min-w-[80px]">
+                        <div class="text-3xl md:text-4xl font-bold text-white mb-1" x-text="String(days).padStart(2, '0')"></div>
+                        <div class="text-sm md:text-base text-white/90">Days</div>
+                    </div>
+                    <div class="bg-white/20 backdrop-blur-sm rounded-lg p-4 md:p-6 min-w-[80px]">
+                        <div class="text-3xl md:text-4xl font-bold text-white mb-1" x-text="String(hours).padStart(2, '0')"></div>
+                        <div class="text-sm md:text-base text-white/90">Hours</div>
+                    </div>
+                    <div class="bg-white/20 backdrop-blur-sm rounded-lg p-4 md:p-6 min-w-[80px]">
+                        <div class="text-3xl md:text-4xl font-bold text-white mb-1" x-text="String(minutes).padStart(2, '0')"></div>
+                        <div class="text-sm md:text-base text-white/90">Minutes</div>
+                    </div>
+                    <div class="bg-white/20 backdrop-blur-sm rounded-lg p-4 md:p-6 min-w-[80px]">
+                        <div class="text-3xl md:text-4xl font-bold text-white mb-1" x-text="String(seconds).padStart(2, '0')"></div>
+                        <div class="text-sm md:text-base text-white/90">Seconds</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
             {% if page.hero_description %}
-            <div class="text-white text-xl mb-8 max-w-2xl mx-auto">
+            <div class="text-white text-lg md:text-xl mb-8 max-w-3xl mx-auto">
                 {{ page.hero_description|richtext }}
             </div>
             {% endif %}
+            
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 {% if page.hero_primary_button_text %}
-                <a href="{{ page.hero_primary_button_url|default:'#' }}" class="theme-button animate-tech-pulse">
+                <a href="{{ page.hero_primary_button_url|default:'#' }}" class="bg-white text-theme-primary px-8 py-3 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors shadow-lg">
                     {{ page.hero_primary_button_text }}
                 </a>
                 {% endif %}
                 {% if page.hero_secondary_button_text %}
-                <a href="{{ page.hero_secondary_button_url|default:'#' }}" class="theme-button bg-transparent border-2 border-white text-white hover:bg-white hover:text-gray-900">
+                <a href="{{ page.hero_secondary_button_url|default:'#' }}" class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-white hover:text-theme-primary transition-colors">
                     {{ page.hero_secondary_button_text }}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Conference Breakdown Section -->
+<section class="theme-section bg-white">
+    <div class="theme-container">
+        <h2 class="theme-heading text-3xl md:text-4xl text-center mb-12">Conference</h2>
+        <p class="text-center text-gray-600 mb-8 text-lg">This is the breakdown of the PyCon Nigeria conference</p>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Tutorials Card -->
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border-l-4 border-blue-500">
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Tutorials</h3>
+                <p class="text-gray-700 mb-4">Deep dive sessions with hands-on learning</p>
+                {% if page.conference_dates %}
+                <p class="text-sm text-gray-600 font-medium">Dates TBA</p>
+                {% endif %}
+            </div>
+            
+            <!-- Sponsor Presentations Card -->
+            <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 border-l-4 border-purple-500">
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Sponsor Presentations</h3>
+                <p class="text-gray-700 mb-4">Learn from our amazing sponsors</p>
+                {% if page.conference_dates %}
+                <p class="text-sm text-gray-600 font-medium">Dates TBA</p>
+                {% endif %}
+            </div>
+            
+            <!-- Main Conference Card -->
+            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 border-l-4 border-green-500">
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Main Conference</h3>
+                <p class="text-gray-700 mb-4">Talks, keynotes, and networking</p>
+                {% if page.conference_dates %}
+                <p class="text-sm text-gray-600 font-medium">{{ page.conference_dates }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Job Fair & Community Showcase Card -->
+            <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 border-l-4 border-orange-500">
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Job Fair & Community Showcase</h3>
+                <p class="text-gray-700 mb-4">Connect with employers and community projects</p>
+                {% if page.conference_dates %}
+                <p class="text-sm text-gray-600 font-medium">Dates TBA</p>
+                {% endif %}
+            </div>
+            
+            <!-- Sprints Card -->
+            <div class="bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg p-6 border-l-4 border-pink-500">
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Sprints</h3>
+                <p class="text-gray-700 mb-4">Collaborative coding sessions</p>
+                {% if page.conference_dates %}
+                <p class="text-sm text-gray-600 font-medium">Dates TBA</p>
+                {% endif %}
+            </div>
+            
+            <!-- Registration Card -->
+            <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg p-6 border-l-4 border-indigo-500">
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Registration</h3>
+                <p class="text-gray-700 mb-4">Secure your spot at PyCon Nigeria</p>
+                {% if page.hero_primary_button_text %}
+                <a href="{{ page.hero_primary_button_url|default:'#' }}" class="inline-block mt-2 text-theme-primary font-semibold hover:underline">
+                    Register Today →
                 </a>
                 {% endif %}
             </div>
@@ -38,7 +131,7 @@
 
 <section class="theme-section">
     <div class="theme-container">
-        <div class="text-center mb-16">
+        <!-- <div class="text-center mb-16">
             <h2 class="theme-heading text-4xl mb-4">{{ page.conference_section_title }} {{ conference_year }}</h2>
             <div class="max-w-3xl mx-auto">
                 <h3 class="text-2xl font-semibold mb-4 text-theme-primary">{{ conference_year_info.name }}</h3>
@@ -69,7 +162,7 @@
                     {% endif %}
                 {% endif %}
             </div>
-        </div>
+        </div> -->
         
         {% if page.features %}
         <div class="theme-grid">
@@ -102,7 +195,7 @@
     </div>
 </section>
 
-<section class="theme-section bg-gray-100">
+<!-- <section class="theme-section bg-gray-100">
     <div class="theme-container">
         <h2 class="theme-heading text-3xl text-center mb-12">{{ page.year_navigation_title }}</h2>
         
@@ -161,10 +254,201 @@
         
         <div class="text-center">
             <div class="text-sm text-gray-500">
-                <p>🎨 Different themes • 🎯 Year-specific content • 📅 Historical archives</p>
+                <p> 🎯 Year-specific content • 📅 Historical archives</p>
             </div>
         </div>
     </div>
-</section>
+</section> -->
 
+{% if page.ticket_pricing %}
+<section class="theme-section">
+    <div class="theme-container">
+        {% if page.ticket_section_title %}
+        <h2 class="theme-heading text-4xl text-center mb-12">{{ page.ticket_section_title }}</h2>
+        {% endif %}
+        <div class="grid md:grid-cols-3 gap-8">
+            {% for ticket in page.ticket_pricing %}
+                {% if ticket.block_type == 'ticket' %}
+                <div class="theme-card text-center">
+                    <h3 class="theme-heading text-2xl mb-4">{{ ticket.value.tier_name }}</h3>
+                    <div class="text-4xl font-bold text-theme-primary mb-4">{{ ticket.value.price }}</div>
+                    <p class="text-gray-600 mb-6">{{ ticket.value.description }}</p>
+                    {% if ticket.value.button_text %}
+                    <a href="{{ ticket.value.button_url|default:'#' }}" class="theme-button w-full">
+                        {{ ticket.value.button_text }}
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% if page.voting_deadline %}
+<section class="theme-section bg-gray-100">
+    <div class="theme-container">
+        {% if page.voting_section_title %}
+        <h2 class="theme-heading text-4xl text-center mb-8">{{ page.voting_section_title }}</h2>
+        {% endif %}
+        {% if page.voting_description %}
+        <div class="text-center mb-8 max-w-3xl mx-auto">
+            {{ page.voting_description|richtext }}
+        </div>
+        {% endif %}
+        <div class="text-center mb-8" x-data="countdown('{{ page.voting_deadline|date:"c" }}')">
+            <div class="flex justify-center space-x-4">
+                <div class="bg-white rounded-lg p-4 shadow-lg">
+                    <div class="text-3xl font-bold text-theme-primary" x-text="String(days).padStart(2, '0')"></div>
+                    <div class="text-sm text-gray-600">days</div>
+                </div>
+                <div class="bg-white rounded-lg p-4 shadow-lg">
+                    <div class="text-3xl font-bold text-theme-primary" x-text="String(hours).padStart(2, '0')"></div>
+                    <div class="text-sm text-gray-600">hours</div>
+                </div>
+                <div class="bg-white rounded-lg p-4 shadow-lg">
+                    <div class="text-3xl font-bold text-theme-primary" x-text="String(minutes).padStart(2, '0')"></div>
+                    <div class="text-sm text-gray-600">minutes</div>
+                </div>
+            </div>
+        </div>
+        {% if page.voting_button_text %}
+        <div class="text-center">
+            <a href="{{ page.voting_button_url|default:'#' }}" class="theme-button">
+                {{ page.voting_button_text }}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+
+{% if page.sponsors %}
+<section class="theme-section">
+    <div class="theme-container">
+        {% if page.sponsor_section_title %}
+        <h2 class="theme-heading text-4xl text-center mb-12">{{ page.sponsor_section_title }}</h2>
+        {% endif %}
+        
+        {% regroup page.sponsors by value.tier as sponsors_by_tier %}
+        {% for tier_group in sponsors_by_tier %}
+        <div class="mb-12">
+            <h3 class="text-2xl font-semibold text-theme-primary mb-6 text-center capitalize">{{ tier_group.grouper }}</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 items-center">
+                {% for sponsor in tier_group.list %}
+                    {% if sponsor.block_type == 'sponsor' %}
+                    <div class="flex items-center justify-center p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                        {% if sponsor.value.website_url %}
+                        <a href="{{ sponsor.value.website_url }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center">
+                        {% endif %}
+                            {% if sponsor.value.logo %}
+                            {% image sponsor.value.logo max-200x100 class="max-h-16 max-w-full object-contain" alt=sponsor.value.name %}
+                            {% else %}
+                            <span class="text-gray-600">{{ sponsor.value.name }}</span>
+                            {% endif %}
+                        {% if sponsor.value.website_url %}
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}
+
+{% block footer %}
+<footer class="theme-footer">
+    <div class="theme-container">
+        <div class="grid md:grid-cols-3 gap-8 mb-8">
+            <div>
+                <h3 class="text-xl font-bold mb-4">{{ site_name }}</h3>
+                <p class="text-gray-300">{{ site_tagline }}</p>
+            </div>
+            
+            <div>
+                <h4 class="font-semibold mb-4">Links</h4>
+                <ul class="space-y-2">
+                    {% if page.footer_links %}
+                        {% for link in page.footer_links %}
+                            {% if link.block_type == 'link' %}
+                            <li>
+                                <a href="{{ link.value.url }}" class="text-gray-300 hover:text-white transition-colors">
+                                    {{ link.value.label }}
+                                </a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <li><a href="/privacy/" class="text-gray-300 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="/faqs/" class="text-gray-300 hover:text-white transition-colors">FAQs</a></li>
+                        <li><a href="/contact/" class="text-gray-300 hover:text-white transition-colors">Contact</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            
+            <div>
+                {% if page.newsletter_title %}
+                <h4 class="font-semibold mb-4">{{ page.newsletter_title }}</h4>
+                {% if page.newsletter_description %}
+                <p class="text-gray-300 text-sm mb-4">{{ page.newsletter_description }}</p>
+                {% endif %}
+                <form id="newsletter-form" class="flex flex-col sm:flex-row gap-2" data-ajax="true" action="{% url 'newsletter_signup' %}" method="post">
+                    {% csrf_token %}
+                    <input type="email" name="email" id="newsletter-email" placeholder="Your email" required class="flex-1 px-4 py-2 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-white">
+                    <button type="submit" class="px-6 py-2 bg-white text-theme-primary rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                        Subscribe
+                    </button>
+                </form>
+                <div id="newsletter-message" class="mt-2 text-sm"></div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="border-t border-gray-700 pt-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-gray-300 text-sm mb-4 md:mb-0">
+                    {{ page.footer_copyright|default:"© PyCon Nigeria. All rights reserved." }}
+                </div>
+                <div class="flex space-x-4">
+                    {% if page.twitter_url %}
+                    <a href="{{ page.twitter_url }}" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"></path></svg>
+                    </a>
+                    {% endif %}
+                    {% if page.facebook_url %}
+                    <a href="{{ page.facebook_url }}" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path></svg>
+                    </a>
+                    {% endif %}
+                    {% if page.linkedin_url %}
+                    <a href="{{ page.linkedin_url }}" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"></path><circle cx="4" cy="4" r="2"></circle></svg>
+                    </a>
+                    {% endif %}
+                    {% if page.instagram_url %}
+                    <a href="{{ page.instagram_url }}" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                    </a>
+                    {% endif %}
+                    {% if page.youtube_url %}
+                    <a href="{{ page.youtube_url }}" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+                    </a>
+                    {% endif %}
+                    {% if page.github_url %}
+                    <a href="{{ page.github_url }}" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"></path></svg>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
 {% endblock %}

@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.urls import include, path
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail import urls as wagtail_urls
@@ -8,12 +9,19 @@ from wagtail.documents import urls as wagtaildocs_urls
 
 from search import views as search_views
 from pyconng.views import year_page_serve
+from home.views import NewsletterSignupView, SignupView, LoginView, LogoutView
 
 urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("admin/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
+    path("newsletter/signup/", NewsletterSignupView.as_view(), name="newsletter_signup"),
+    
+    # Authentication URLs
+    path("accounts/signup/", SignupView.as_view(), name="signup"),
+    path("accounts/login/", LoginView.as_view(), name="login"),
+    path("accounts/logout/", LogoutView.as_view(), name="logout"),
     
     # Year-specific routing using custom view. Past years are read-only snapshots.
     path("<int:year>/search/", search_views.search, name="year_search"),

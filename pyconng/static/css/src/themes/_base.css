@@ -73,12 +73,29 @@
 
 .theme-card {
   border-left: 4px solid var(--theme-primary);
+  background: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.theme-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
 }
 
 .theme-button {
   background-color: var(--theme-primary);
   color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
   transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
 }
 
 .theme-button:hover {
@@ -94,4 +111,97 @@
 
 .theme-link:hover {
   color: var(--theme-primary-700);
+}
+
+/* Navigation */
+.theme-nav {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+
+.theme-nav-link {
+  color: var(--theme-primary);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  transition: all 0.3s ease;
+}
+
+.theme-nav-link:hover {
+  background-color: var(--theme-primary-50);
+  color: var(--theme-primary-700);
+}
+
+/* Footer */
+.theme-footer {
+  background: linear-gradient(135deg, var(--theme-primary-900), var(--theme-secondary-900));
+  color: white;
+  padding: 3rem 0 1.5rem;
+  margin-top: 4rem;
+}
+
+.theme-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.theme-section {
+  padding: 4rem 0;
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.theme-heading {
+  font-weight: 700;
+  color: var(--theme-primary);
+  margin-bottom: 1rem;
+}
+
+/* Form styling */
+.auth-form-container {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.auth-form-field {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.auth-form-field:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: var(--theme-primary);
+  border-color: transparent;
+}
+
+.auth-form-button {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--theme-primary);
+  color: white;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.auth-form-button:hover {
+  background-color: var(--theme-primary-600);
+  transform: translateY(-1px);
 } 

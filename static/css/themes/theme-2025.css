@@ -1,0 +1,300 @@
+/**
+ * PyCon Nigeria 2025 Theme
+ * Theme: "Creative Community" - Emerald and Indigo
+ * Color Story: Growth meets creativity
+ * Design Language: Bold, modern, community-focused
+ */
+
+/* 2025-specific font imports */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+/* ==================================
+   2025 Theme Variables
+   ================================== */
+.theme-2025 {
+    /* Typography */
+    --theme-font-heading: 'Outfit', 'Inter', sans-serif;
+    --theme-font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+    
+    /* Colors */
+    --theme-primary: #10b981;     /* Emerald green */
+    --theme-secondary: #6366f1;   /* Indigo */
+    --theme-accent: #f59e0b;      /* Amber */
+    
+    /* Gradients */
+    --theme-gradient-hero: linear-gradient(135deg, #10b981 0%, #6366f1 100%);
+    --theme-gradient-card: linear-gradient(to bottom right, #d1fae5, #e0e7ff);
+    
+    /* Shadows */
+    --theme-shadow-sm: 0 2px 8px rgba(16, 185, 129, 0.1);
+    --theme-shadow-md: 0 4px 16px rgba(16, 185, 129, 0.15);
+    --theme-shadow-lg: 0 8px 24px rgba(16, 185, 129, 0.2);
+    --theme-shadow-xl: 0 16px 48px rgba(16, 185, 129, 0.25);
+    
+    /* Border Radius */
+    --theme-radius-sm: 12px;
+    --theme-radius-md: 16px;
+    --theme-radius-lg: 24px;
+    --theme-radius-xl: 32px;
+}
+
+/* ==================================
+   Archive Indicator
+   ================================== */
+.theme-2025 .archive-indicator {
+    background: var(--theme-accent);
+    color: white;
+    padding: 12px;
+    text-align: center;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--theme-shadow-md);
+    font-family: var(--theme-font-heading);
+}
+
+.theme-2025 .archive-indicator a {
+    color: white;
+    text-decoration: underline;
+    margin-left: 1rem;
+}
+
+/* ==================================
+   Hero Section
+   ================================== */
+.theme-2025 .hero-modern {
+    background: var(--theme-gradient-hero);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.theme-2025 .hero-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+        radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.1) 2px, transparent 2px);
+    background-size: 60px 60px;
+}
+
+.theme-2025 h1 {
+    font-family: var(--theme-font-heading);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+}
+
+/* ==================================
+   Feature Cards
+   ================================== */
+.theme-2025 .feature-card {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--theme-radius-lg);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--theme-shadow-sm);
+}
+
+.theme-2025 .feature-card:hover {
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: var(--theme-shadow-xl);
+}
+
+.theme-2025 .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--theme-gradient-hero);
+    border-radius: var(--theme-radius-lg) var(--theme-radius-lg) 0 0;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.theme-2025 .feature-card:hover::before {
+    opacity: 1;
+}
+
+.theme-2025 .feature-card h3 {
+    color: var(--theme-primary);
+    font-family: var(--theme-font-heading);
+    font-weight: 800;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* ==================================
+   Buttons
+   ================================== */
+.theme-2025 .btn-primary {
+    background: var(--theme-accent);
+    color: white;
+    padding: 1.25rem 2.5rem;
+    border-radius: 50px;
+    font-weight: 800;
+    font-family: var(--theme-font-heading);
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    box-shadow: var(--theme-shadow-lg);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.theme-2025 .btn-primary:hover {
+    background: #d97706;
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: var(--theme-shadow-xl);
+}
+
+.theme-2025 .btn-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    color: white;
+    border: 2px solid white;
+    padding: 1.25rem 2.5rem;
+    border-radius: 50px;
+    font-weight: 800;
+    font-family: var(--theme-font-heading);
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.theme-2025 .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: var(--theme-accent);
+}
+
+/* ==================================
+   Sections
+   ================================== */
+.theme-2025 .section {
+    padding: 6rem 0;
+}
+
+.theme-2025 .section-title {
+    font-family: var(--theme-font-heading);
+    font-size: 3.5rem;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 4rem;
+    color: #111827;
+    letter-spacing: -0.02em;
+}
+
+/* ==================================
+   Grid Layouts
+   ================================== */
+.theme-2025 .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2.5rem;
+    margin-top: 3rem;
+}
+
+/* ==================================
+   Sponsors Section
+   ================================== */
+.theme-2025 .sponsor-card {
+    display: flex;
+    align-items: center;
+    justify-center;
+    padding: 2rem;
+    background: #f9fafb;
+    border-radius: var(--theme-radius-md);
+    transition: all 0.3s;
+}
+
+.theme-2025 .sponsor-card:hover {
+    background: white;
+    box-shadow: var(--theme-shadow-md);
+}
+
+/* ==================================
+   Footer
+   ================================== */
+.theme-2025 .footer-archive {
+    background: var(--theme-primary);
+    color: white;
+    padding: 4rem 0;
+    text-align: center;
+}
+
+.theme-2025 .footer-archive a {
+    color: white;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.75rem 2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 700;
+    display: inline-block;
+    transition: all 0.3s;
+}
+
+.theme-2025 .footer-archive a:hover {
+    background: white;
+    color: var(--theme-primary);
+}
+
+/* ==================================
+   Responsive Design
+   ================================== */
+@media (max-width: 768px) {
+    .theme-2025 .section-title {
+        font-size: 2.5rem;
+    }
+    
+    .theme-2025 .features-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .theme-2025 .btn-primary,
+    .theme-2025 .btn-secondary {
+        padding: 1rem 2rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* ==================================
+   Animations
+   ================================== */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.theme-2025 .animate-slide {
+    animation: slideInUp 0.6s ease-out;
+}
+
+.theme-2025 .animate-scale {
+    animation: scaleIn 0.5s ease-out;
+}

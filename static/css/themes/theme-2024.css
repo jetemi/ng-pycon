@@ -1,0 +1,255 @@
+/**
+ * PyCon Nigeria 2024 Theme
+ * Theme: "Tech Innovation" - Blue and Purple
+ * Color Story: Technology meets innovation
+ * Design Language: Modern, geometric, tech-focused
+ */
+
+/* 2024-specific font imports */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap');
+
+/* ==================================
+   2024 Theme Variables
+   ================================== */
+.theme-2024 {
+    /* Typography */
+    --theme-font-heading: 'Space Grotesk', 'Inter', sans-serif;
+    --theme-font-body: 'Inter', system-ui, sans-serif;
+    --theme-font-mono: 'JetBrains Mono', 'Courier New', monospace;
+    
+    /* Colors */
+    --theme-primary: #3b82f6;     /* Blue */
+    --theme-secondary: #8b5cf6;   /* Purple */
+    --theme-accent: #ec4899;      /* Pink */
+    
+    /* Gradients */
+    --theme-gradient-hero: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    --theme-gradient-card: linear-gradient(to bottom right, #eff6ff, #f3e8ff);
+    
+    /* Shadows */
+    --theme-shadow-sm: 0 2px 4px rgba(59, 130, 246, 0.1);
+    --theme-shadow-md: 0 4px 8px rgba(59, 130, 246, 0.15);
+    --theme-shadow-lg: 0 8px 16px rgba(59, 130, 246, 0.2);
+    --theme-shadow-xl: 0 16px 32px rgba(59, 130, 246, 0.25);
+    
+    /* Border Radius */
+    --theme-radius-sm: 8px;
+    --theme-radius-md: 12px;
+    --theme-radius-lg: 16px;
+    --theme-radius-xl: 24px;
+}
+
+/* ==================================
+   Archive Badge
+   ================================== */
+.theme-2024 .archive-badge {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--theme-accent);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-weight: bold;
+    z-index: 1000;
+    box-shadow: var(--theme-shadow-lg);
+    font-family: var(--theme-font-heading);
+}
+
+/* ==================================
+   Hero Section
+   ================================== */
+.theme-2024 .hero-section {
+    background: var(--theme-gradient-hero);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.theme-2024 .hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.5;
+}
+
+.theme-2024 .hero-content {
+    position: relative;
+    z-index: 10;
+}
+
+/* ==================================
+   Feature Cards
+   ================================== */
+.theme-2024 .feature-card {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--theme-radius-lg);
+    box-shadow: var(--theme-shadow-md);
+    transition: all 0.3s ease;
+}
+
+.theme-2024 .feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--theme-shadow-xl);
+}
+
+.theme-2024 .feature-card h3 {
+    color: var(--theme-primary);
+    font-family: var(--theme-font-heading);
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.theme-2024 .feature-card p {
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+.theme-2024 .feature-card a {
+    color: var(--theme-primary);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.theme-2024 .feature-card a:hover {
+    color: var(--theme-secondary);
+}
+
+/* ==================================
+   Buttons
+   ================================== */
+.theme-2024 .btn-primary {
+    background: white;
+    color: var(--theme-primary);
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-family: var(--theme-font-heading);
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    box-shadow: var(--theme-shadow-md);
+}
+
+.theme-2024 .btn-primary:hover {
+    background: #f3f4f6;
+    transform: scale(1.05);
+    box-shadow: var(--theme-shadow-lg);
+}
+
+.theme-2024 .btn-secondary {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-family: var(--theme-font-heading);
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.theme-2024 .btn-secondary:hover {
+    background: white;
+    color: var(--theme-primary);
+}
+
+/* ==================================
+   Sections
+   ================================== */
+.theme-2024 .section {
+    padding: 5rem 0;
+}
+
+.theme-2024 .section-title {
+    font-family: var(--theme-font-heading);
+    font-size: 3rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 3rem;
+    background: var(--theme-gradient-hero);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ==================================
+   Grid Layouts
+   ================================== */
+.theme-2024 .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+/* ==================================
+   Footer
+   ================================== */
+.theme-2024 .footer-note {
+    background: #1f2937;
+    color: white;
+    padding: 3rem 0;
+    text-align: center;
+}
+
+.theme-2024 .footer-note a {
+    color: var(--theme-primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.theme-2024 .footer-note a:hover {
+    color: var(--theme-accent);
+}
+
+/* ==================================
+   Responsive Design
+   ================================== */
+@media (max-width: 768px) {
+    .theme-2024 .archive-badge {
+        top: 10px;
+        right: 10px;
+        padding: 6px 12px;
+        font-size: 0.875rem;
+    }
+    
+    .theme-2024 .section-title {
+        font-size: 2rem;
+    }
+    
+    .theme-2024 .features-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+/* ==================================
+   Animations
+   ================================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.theme-2024 .animate-in {
+    animation: fadeInUp 0.6s ease-out;
+}

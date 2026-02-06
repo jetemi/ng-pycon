@@ -1,0 +1,315 @@
+/* PyCon Nigeria 2024 Theme
+ * Theme: "Tech Innovation" - Blue and Green
+ * Color story: Technology (blue) meets growth/nature (green)
+ * Design Language: Clean, geometric, tech-focused
+ */
+
+/* 2024-specific font imports */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap');
+
+[data-theme="2024"] {
+  /* Typography System */
+  --theme-font-heading: 'Space Grotesk', 'Inter', sans-serif;
+  --theme-font-body: 'Inter', system-ui, sans-serif;
+  --theme-font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  
+  /* Font Sizes (Tech-focused scale) */
+  --theme-text-xs: 0.75rem;
+  --theme-text-sm: 0.875rem;
+  --theme-text-base: 1rem;
+  --theme-text-lg: 1.125rem;
+  --theme-text-xl: 1.25rem;
+  --theme-text-2xl: 1.5rem;
+  --theme-text-3xl: 1.875rem;
+  --theme-text-4xl: 2.25rem;
+  --theme-text-5xl: 3rem;
+  
+  /* Spacing System (Geometric progression) */
+  --theme-spacing-xs: 0.25rem;
+  --theme-spacing-sm: 0.5rem;
+  --theme-spacing-md: 1rem;
+  --theme-spacing-lg: 1.5rem;
+  --theme-spacing-xl: 2rem;
+  --theme-spacing-2xl: 3rem;
+  --theme-spacing-3xl: 4rem;
+  
+  /* Border Radius (Sharp, tech aesthetic) */
+  --theme-radius-sm: 4px;
+  --theme-radius-md: 8px;
+  --theme-radius-lg: 12px;
+  --theme-radius-xl: 16px;
+  
+  /* Shadows (Tech-inspired) */
+  --theme-shadow-sm: 0 2px 4px rgba(37, 99, 235, 0.1);
+  --theme-shadow-md: 0 4px 8px rgba(37, 99, 235, 0.15);
+  --theme-shadow-lg: 0 8px 16px rgba(37, 99, 235, 0.2);
+  --theme-shadow-xl: 0 16px 32px rgba(37, 99, 235, 0.25);
+
+  /* Primary: Blue - representing technology and trust */
+  --theme-primary: #2563eb;
+  --theme-primary-50: #eff6ff;
+  --theme-primary-100: #dbeafe;
+  --theme-primary-200: #bfdbfe;
+  --theme-primary-300: #93c5fd;
+  --theme-primary-400: #60a5fa;
+  --theme-primary-500: #3b82f6;
+  --theme-primary-600: #2563eb;
+  --theme-primary-700: #1d4ed8;
+  --theme-primary-800: #1e40af;
+  --theme-primary-900: #1e3a8a;
+  
+  /* Secondary: Green - representing growth and sustainability */
+  --theme-secondary: #059669;
+  --theme-secondary-50: #ecfdf5;
+  --theme-secondary-100: #d1fae5;
+  --theme-secondary-200: #a7f3d0;
+  --theme-secondary-300: #6ee7b7;
+  --theme-secondary-400: #34d399;
+  --theme-secondary-500: #10b981;
+  --theme-secondary-600: #059669;
+  --theme-secondary-700: #047857;
+  --theme-secondary-800: #065f46;
+  --theme-secondary-900: #064e3b;
+  
+  /* Accent: Amber - representing energy and innovation */
+  --theme-accent: #f59e0b;
+  --theme-accent-50: #fffbeb;
+  --theme-accent-100: #fef3c7;
+  --theme-accent-200: #fde68a;
+  --theme-accent-300: #fcd34d;
+  --theme-accent-400: #fbbf24;
+  --theme-accent-500: #f59e0b;
+  --theme-accent-600: #d97706;
+  --theme-accent-700: #b45309;
+  --theme-accent-800: #92400e;
+  --theme-accent-900: #78350f;
+}
+
+/* 2024 Typography Overrides */
+[data-theme="2024"] h1,
+[data-theme="2024"] h2,
+[data-theme="2024"] h3,
+[data-theme="2024"] h4,
+[data-theme="2024"] h5,
+[data-theme="2024"] h6,
+[data-theme="2024"] .theme-heading {
+  font-family: var(--theme-font-heading);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+[data-theme="2024"] body,
+[data-theme="2024"] p,
+[data-theme="2024"] .theme-body {
+  font-family: var(--theme-font-body);
+  line-height: 1.6;
+}
+
+[data-theme="2024"] code,
+[data-theme="2024"] pre,
+[data-theme="2024"] .theme-code {
+  font-family: var(--theme-font-mono);
+  background: rgba(37, 99, 235, 0.1);
+  padding: 0.125rem 0.25rem;
+  border-radius: var(--theme-radius-sm);
+  font-size: 0.9em;
+}
+
+/* 2024 Layout System - Grid-based, geometric */
+[data-theme="2024"] .theme-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--theme-spacing-md);
+}
+
+[data-theme="2024"] .theme-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--theme-spacing-lg);
+}
+
+[data-theme="2024"] .theme-section {
+  padding: var(--theme-spacing-3xl) 0;
+}
+
+/* 2024 Component Architecture - Tech aesthetic */
+[data-theme="2024"] .theme-hero {
+  background: linear-gradient(135deg, #2563eb 0%, #059669 50%, #f59e0b 100%);
+  position: relative;
+  padding: var(--theme-spacing-3xl) 0;
+  overflow: hidden;
+}
+
+[data-theme="2024"] .theme-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="tech-grid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23tech-grid)"/></svg>');
+  opacity: 0.3;
+}
+
+[data-theme="2024"] .theme-hero h1 {
+  font-size: var(--theme-text-5xl);
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  margin-bottom: var(--theme-spacing-lg);
+}
+
+/* 2024 Cards - Sharp, tech-focused */
+[data-theme="2024"] .theme-card {
+  background: white;
+  border-radius: var(--theme-radius-lg);
+  box-shadow: var(--theme-shadow-md);
+  border-left: 4px solid var(--theme-primary);
+  padding: var(--theme-spacing-xl);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="2024"] .theme-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--theme-primary), var(--theme-secondary));
+}
+
+[data-theme="2024"] .theme-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--theme-shadow-xl);
+}
+
+/* 2024 Buttons - Tech aesthetic */
+[data-theme="2024"] .theme-button {
+  background: linear-gradient(45deg, var(--theme-primary), var(--theme-secondary));
+  color: white;
+  border: none;
+  border-radius: var(--theme-radius-md);
+  padding: var(--theme-spacing-md) var(--theme-spacing-xl);
+  font-family: var(--theme-font-heading);
+  font-weight: 500;
+  font-size: var(--theme-text-base);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--theme-shadow-md);
+}
+
+[data-theme="2024"] .theme-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+[data-theme="2024"] .theme-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--theme-shadow-lg);
+}
+
+[data-theme="2024"] .theme-button:hover::before {
+  left: 100%;
+}
+
+/* 2024 Navigation - Clean, tech-focused */
+[data-theme="2024"] .theme-nav {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 2px solid var(--theme-primary);
+  padding: var(--theme-spacing-md) 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+[data-theme="2024"] .theme-nav-link {
+  color: var(--theme-primary);
+  text-decoration: none;
+  font-family: var(--theme-font-heading);
+  font-weight: 500;
+  padding: var(--theme-spacing-sm) var(--theme-spacing-md);
+  border-radius: var(--theme-radius-sm);
+  transition: all 0.3s ease;
+}
+
+[data-theme="2024"] .theme-nav-link:hover {
+  background: var(--theme-primary);
+  color: white;
+}
+
+/* 2024 Animations - Tech-inspired */
+[data-theme="2024"] .animate-tech-pulse {
+  animation: techPulse 3s ease-in-out infinite;
+}
+
+@keyframes techPulse {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
+  }
+  50% { 
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+  }
+}
+
+[data-theme="2024"] .animate-tech-slide-in {
+  animation: techSlideIn 0.6s ease-out;
+}
+
+@keyframes techSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 2024 Footer - Tech aesthetic */
+[data-theme="2024"] .theme-footer {
+  background: linear-gradient(135deg, #1e3a8a, #064e3b);
+  color: white;
+  padding: var(--theme-spacing-3xl) 0 var(--theme-spacing-xl);
+  position: relative;
+}
+
+[data-theme="2024"] .theme-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--theme-primary), var(--theme-secondary), var(--theme-accent));
+}
+
+/* 2024 Responsive Breakpoints */
+@media (max-width: 768px) {
+  [data-theme="2024"] .theme-hero h1 {
+    font-size: var(--theme-text-3xl);
+  }
+  
+  [data-theme="2024"] .theme-grid {
+    grid-template-columns: 1fr;
+    gap: var(--theme-spacing-md);
+  }
+  
+  [data-theme="2024"] .theme-section {
+    padding: var(--theme-spacing-2xl) 0;
+  }
+} 

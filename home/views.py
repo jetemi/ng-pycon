@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -10,6 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
+from pyconng.context_processors import CURRENT_YEAR
 import json
 from .models import NewsletterSubscriber
 from .forms import SignupForm
@@ -69,10 +70,20 @@ class NewsletterSignupView(View):
 
 
 class SignupView(FormView):
-    """User signup view."""
+    """User signup view. Only works for current year."""
     template_name = 'home/signup.html'
     form_class = SignupForm
     success_url = '/'
+    
+    def dispatch(self, request, *args, **kwargs):
+        """Block signup for archived years."""
+        # Check if we're on an archived year URL
+        path = request.path
+        if path.startswith('/') and len(path) > 1:
+            parts = path.strip('/').split('/')
+            if parts[0].isdigit() and int(parts[0]) != CURRENT_YEAR:
+                return HttpResponseForbidden("Authentication is only available for the current conference year.")
+        return super().dispatch(request, *args, **kwargs)
     
     def form_valid(self, form):
         user = form.save()
@@ -86,9 +97,19 @@ class SignupView(FormView):
 
 
 class LoginView(DjangoLoginView):
-    """User login view."""
+    """User login view. Only works for current year."""
     template_name = 'home/login.html'
     redirect_authenticated_user = True
+    
+    def dispatch(self, request, *args, **kwargs):
+        """Block login for archived years."""
+        # Check if we're on an archived year URL
+        path = request.path
+        if path.startswith('/') and len(path) > 1:
+            parts = path.strip('/').split('/')
+            if parts[0].isdigit() and int(parts[0]) != CURRENT_YEAR:
+                return HttpResponseForbidden("Authentication is only available for the current conference year.")
+        return super().dispatch(request, *args, **kwargs)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -109,8 +130,18 @@ class LoginView(DjangoLoginView):
 
 
 class LogoutView(LoginRequiredMixin, TemplateView):
-    """User logout view with confirmation."""
+    """User logout view with confirmation. Only works for current year."""
     template_name = 'home/logout.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        """Block logout page for archived years."""
+        # Check if we're on an archived year URL
+        path = request.path
+        if path.startswith('/') and len(path) > 1:
+            parts = path.strip('/').split('/')
+            if parts[0].isdigit() and int(parts[0]) != CURRENT_YEAR:
+                return HttpResponseForbidden("Authentication is only available for the current conference year.")
+        return super().dispatch(request, *args, **kwargs)
     
     def post(self, request):
         """Handle logout confirmation."""

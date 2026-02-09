@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load wagtailcore_tags wagtailimages_tags %}
 
-{% block body_class %}template-standardpage{% endblock %}
+{% block body_class %}template-standardpage{% if page_theme %} {{ page_theme }}{% endif %}{% endblock %}
 
 {% block content %}
 <section class="theme-section">

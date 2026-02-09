@@ -303,6 +303,15 @@ class HomePage(Page):
             if not self.title or self.title == "Home":
                 self.title = f"PyCon Nigeria {self.conference_year}"
         return super().save(*args, **kwargs)
+    
+    def get_context(self, request, *args, **kwargs):
+        """
+        Add theme information to context for this HomePage.
+        """
+        context = super().get_context(request, *args, **kwargs)
+        context['page_theme'] = self.theme
+        context['page_conference_year'] = self.conference_year
+        return context
 
     content_panels = Page.content_panels + [
         MultiFieldPanel([
@@ -410,6 +419,40 @@ class StandardPage(Page):
         FieldPanel("intro"),
         FieldPanel("body"),
     ]
+    
+    def get_parent_homepage(self):
+        """
+        Traverse up the page tree to find the parent HomePage.
+        This allows child pages to inherit theme from their year's homepage.
+        """
+        parent = self.get_parent()
+        
+        while parent:
+            if isinstance(parent.specific, HomePage):
+                return parent.specific
+            parent = parent.get_parent()
+        
+        return None
+    
+    def get_context(self, request, *args, **kwargs):
+        """
+        Add parent HomePage theme information to context.
+        This allows child pages to use the same theme as their parent year.
+        """
+        context = super().get_context(request, *args, **kwargs)
+        
+        # Get parent HomePage to inherit theme
+        parent_homepage = self.get_parent_homepage()
+        
+        if parent_homepage:
+            context['parent_homepage'] = parent_homepage
+            context['page_theme'] = parent_homepage.theme
+            context['page_conference_year'] = parent_homepage.conference_year
+        else:
+            context['page_theme'] = 'default'
+            context['page_conference_year'] = None
+        
+        return context
 
     class Meta:
         verbose_name = "Standard Page"

@@ -25,6 +25,11 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
         <link rel="stylesheet" type="text/css" href="{% static 'css/pyconng.css' %}">
+        
+        {% comment %}Load theme-specific CSS if page has a theme{% endcomment %}
+        {% if page_theme and page_theme != 'default' %}
+        <link rel="stylesheet" href="{% static 'css/themes/' %}{{ page_theme }}.css">
+        {% endif %}
 
         {% block extra_css %}{% endblock %}
 
@@ -47,7 +52,7 @@
         <meta name="current-year" content="{{ current_year }}">
     </head>
 
-    <body class="{% block body_class %}{% endblock %} font-sans antialiased bg-gray-50 text-gray-900">
+    <body class="{% block body_class %}{% endblock %}{% if page_theme and page_theme != 'default' %} {{ page_theme }}{% endif %} font-sans antialiased bg-gray-50 text-gray-900">
         {% wagtailuserbar %}
 
         {% block header %}
@@ -79,13 +84,23 @@
                     </div>
                     
                     <div class="flex items-center space-x-4">
-                        {% if user.is_authenticated %}
-                        <a href="{% url 'logout' %}" class="theme-nav-link">Sign Out</a>
+                        {% comment %}Only show auth for current year{% endcomment %}
+                        {% if is_current_year %}
+                            {% if user.is_authenticated %}
+                            <a href="{% url 'logout' %}" class="theme-nav-link">Sign Out</a>
+                            {% else %}
+                            <a href="{% url 'signup' %}" class="theme-nav-link">Sign Up</a>
+                            <a href="{% url 'login' %}" class="theme-button">
+                                Sign In
+                            </a>
+                            {% endif %}
                         {% else %}
-                        <a href="{% url 'signup' %}" class="theme-nav-link">Sign Up</a>
-                        <a href="{% url 'login' %}" class="theme-button">
-                            Sign In
-                        </a>
+                            {% comment %}For archived years, show archive indicator{% endcomment %}
+                            {% if page_conference_year %}
+                            <span class="text-sm px-3 py-1 bg-gray-200 text-gray-700 rounded-full">
+                                {{ page_conference_year }} Archive
+                            </span>
+                            {% endif %}
                         {% endif %}
                         
                         <button @click="toggle()" class="md:hidden text-theme-primary focus:outline-none">
@@ -113,6 +128,8 @@
                             <a href="/speakers/" class="theme-nav-link block">Speakers</a>
                             <a href="/sponsors/" class="theme-nav-link block">Sponsors</a>
                         {% endif %}
+                        {% comment %}Only show auth for current year{% endcomment %}
+                        {% if is_current_year %}
                         <div class="pt-4 border-t border-gray-200 mt-2">
                             {% if user.is_authenticated %}
                             <a href="{% url 'logout' %}" class="theme-nav-link block">Sign Out</a>
@@ -121,6 +138,13 @@
                             <a href="{% url 'login' %}" class="theme-button block text-center mt-2">Sign In</a>
                             {% endif %}
                         </div>
+                        {% elif page_conference_year %}
+                        <div class="pt-4 border-t border-gray-200 mt-2">
+                            <span class="text-sm px-3 py-1 bg-gray-200 text-gray-700 rounded-full block text-center">
+                                {{ page_conference_year }} Archive
+                            </span>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -153,8 +177,19 @@
 
         {% block footer %}{% endblock %}
 
-        <script defer src="{% static 'js/alpine.min.js' %}"></script>
+        <script type="importmap">
+        {
+            "imports": {
+                "alpinejs": "https://cdn.jsdelivr.net/npm/alpinejs@3/dist/module.esm.js"
+            }
+        }
+        </script>
         <script type="module" src="{% static 'js/pyconng.js' %}"></script>
+        
+        {% comment %}Load theme-specific JS if page has a theme{% endcomment %}
+        {% if page_theme and page_theme != 'default' %}
+        <script src="{% static 'js/themes/' %}{{ page_theme }}.js" defer></script>
+        {% endif %}
 
         {% block extra_js %}{% endblock %}
     </body>

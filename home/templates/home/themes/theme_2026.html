@@ -1,173 +1,408 @@
 {% extends "base.html" %}
-{% load static wagtailcore_tags %}
+{% load static wagtailcore_tags wagtailimages_tags %}
 
 {% comment %}
-2026 Theme Template - "Future Forward"
-Modern, clean, professional design with teal/blue/orange color palette
+PyCon Nigeria 2026 Theme — "Future Forward"
+Deep Teal + Gold on dark charcoal.  Dot-pattern hero, teal wave divider,
+undraw SVG illustrations.  All 12 editable sections rendered.
 {% endcomment %}
 
 {% block body_class %}template-homepage theme-2026{% endblock %}
 
-{% block extra_css %}
-<!-- 2026 Theme Stylesheet -->
-<link rel="stylesheet" href="{% static 'css/themes/theme-2026.css' %}">
-{% endblock %}
-
-{% block extra_js %}
-<!-- 2026 Theme JavaScript -->
-<script src="{% static 'js/themes/theme-2026.js' %}" defer></script>
-{% endblock %}
-
 {% block content %}
-<!-- Year Badge -->
-{% if page.conference_year %}
-<div class="year-badge">
-    {{ page.conference_year }}
-</div>
-{% endif %}
 
-<!-- Hero Section -->
-<section class="hero-modern text-white">
-    <div class="max-w-7xl mx-auto px-4 relative z-10">
+<section class="hero-2026 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center">
-            <h1 class="text-5xl md:text-7xl font-black mb-6 tracking-tight">
+            {# Title #}
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-4 tracking-tight animate-in">
                 {{ page.hero_title }}
-                {% if page.conference_year %}{{ page.conference_year }}{% endif %}
+                {% if page.conference_year %}<span class="text-[#14B8A6]">{{ page.conference_year }}</span>{% endif %}
             </h1>
-            
+
+            {# Subtitle #}
             {% if page.hero_subtitle %}
-            <p class="text-2xl md:text-3xl mb-4 font-light opacity-95">
+            <p class="text-xl md:text-2xl mb-6 font-light opacity-90 animate-in" style="animation-delay:.1s">
                 {{ page.hero_subtitle }}
             </p>
             {% endif %}
-            
+
+            {# Location & Dates #}
             {% if page.conference_dates or page.conference_location %}
-            <div class="text-xl mb-8 opacity-90">
+            <div class="flex flex-wrap justify-center gap-6 text-lg mb-8 opacity-85 animate-in" style="animation-delay:.15s">
                 {% if page.conference_dates %}
-                    <span class="mr-8">📅 {{ page.conference_dates }}</span>
+                <span class="inline-flex items-center gap-2">
+                    <svg class="w-5 h-5 text-[#F59E0B]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    {{ page.conference_dates }}
+                </span>
                 {% endif %}
                 {% if page.conference_location %}
-                    <span>📍 {{ page.conference_location }}</span>
+                <span class="inline-flex items-center gap-2">
+                    <svg class="w-5 h-5 text-[#F59E0B]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    {{ page.conference_location }}
+                </span>
                 {% endif %}
             </div>
             {% endif %}
-            
+
+            {# Hero description #}
             {% if page.hero_description %}
-            <div class="text-lg mb-10 max-w-4xl mx-auto opacity-95">
+            <div class="text-lg md:text-xl mb-8 max-w-3xl mx-auto opacity-90 leading-relaxed animate-in" style="animation-delay:.2s">
                 {{ page.hero_description|richtext }}
             </div>
             {% endif %}
-            
-            <div class="flex flex-wrap gap-4 justify-center">
+
+            {# Countdown timer (reuses voting_deadline for the conference countdown) #}
+            {% if page.voting_deadline %}
+            <div class="mb-10 animate-in" style="animation-delay:.25s"
+                 x-data="countdown('{{ page.voting_deadline|date:"c" }}')">
+                <div class="flex justify-center gap-4 md:gap-6">
+                    <div class="countdown-box">
+                        <div class="countdown-value" x-text="String(days).padStart(2,'0')"></div>
+                        <div class="countdown-label">Days</div>
+                    </div>
+                    <div class="countdown-box">
+                        <div class="countdown-value" x-text="String(hours).padStart(2,'0')"></div>
+                        <div class="countdown-label">Hours</div>
+                    </div>
+                    <div class="countdown-box">
+                        <div class="countdown-value" x-text="String(minutes).padStart(2,'0')"></div>
+                        <div class="countdown-label">Minutes</div>
+                    </div>
+                    <div class="countdown-box">
+                        <div class="countdown-value" x-text="String(seconds).padStart(2,'0')"></div>
+                        <div class="countdown-label">Seconds</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {# CTA Buttons #}
+            <div class="flex flex-wrap gap-4 justify-center animate-in" style="animation-delay:.3s">
                 {% if page.hero_primary_button_url %}
-                <a href="{{ page.hero_primary_button_url }}" 
-                   class="bg-white text-teal-600 px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl">
-                    {{ page.hero_primary_button_text }}
+                <a href="{{ page.hero_primary_button_url }}" class="btn-gold">
+                    {{ page.hero_primary_button_text|default:"Register Now" }}
                 </a>
                 {% endif %}
-                
                 {% if page.hero_secondary_button_url %}
-                <a href="{{ page.hero_secondary_button_url }}" 
-                   class="bg-transparent border-3 border-white text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-teal-600 transition-all">
-                    {{ page.hero_secondary_button_text }}
+                <a href="{{ page.hero_secondary_button_url }}" class="btn-outline">
+                    {{ page.hero_secondary_button_text|default:"Call for Papers" }}
                 </a>
                 {% endif %}
             </div>
         </div>
     </div>
+
+    {# Wave SVG at the very bottom of the hero #}
+    <div class="hero-waves">
+        <img src="{% static 'assets/2026/svg/home-waves.svg' %}" alt="" aria-hidden="true">
+    </div>
 </section>
 
-<!-- Conference Info Section -->
-{% if page.conference_description or page.features %}
-<section class="py-24 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4">
-        {% if page.conference_section_title %}
-        <h2 class="text-5xl font-black text-center mb-16 text-gray-900">
-            {{ page.conference_section_title }}
-        </h2>
-        {% endif %}
-        
-        {% if page.conference_description %}
-        <div class="text-xl mb-16 max-w-4xl mx-auto text-gray-700 text-center">
-            {{ page.conference_description|richtext }}
+{% if page.conference_section_title or page.conference_description %}
+<section class="section-2026 white-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="info-layout">
+            <div>
+                {% if page.conference_section_title %}
+                <h2 class="section-title-2026 text-left mb-4">{{ page.conference_section_title }}</h2>
+                {% endif %}
+                {% if page.conference_description %}
+                <div class="text-lg leading-relaxed text-gray-600">
+                    {{ page.conference_description|richtext }}
+                </div>
+                {% endif %}
+            </div>
+            <div class="flex justify-center">
+                <img src="{% static 'assets/2026/svg/idea.svg' %}"
+                     alt="Conference idea illustration"
+                     class="section-illustration"
+                     style="max-width:320px">
+            </div>
         </div>
-        {% endif %}
-        
-        <!-- Features Grid -->
-        {% if page.features %}
+    </div>
+</section>
+{% endif %}
+
+{% if page.features %}
+<section class="section-2026 light-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="section-title-2026">Conference Highlights</h2>
+
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {% for block in page.features %}
-                <div class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-                    {% if block.value.icon_svg %}
-                    <div class="mb-6 text-teal-600">
-                        {{ block.value.icon_svg|safe }}
+            <div class="feature-card">
+                {% if block.value.icon_svg %}
+                <div class="mb-4 text-[#0F766E]">
+                    {{ block.value.icon_svg|safe }}
+                </div>
+                {% endif %}
+                <h3>{{ block.value.title }}</h3>
+                <p>{{ block.value.description }}</p>
+                {% if block.value.link_url %}
+                <a href="{{ block.value.link_url }}" class="feature-link">
+                    {{ block.value.link_text|default:"Learn more" }}
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% if page.voting_section_title or page.voting_deadline %}
+<section class="section-2026 dark-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="info-layout">
+            {# Text side #}
+            <div>
+                {% if page.voting_section_title %}
+                <h2 class="section-title-2026 text-left mb-4">{{ page.voting_section_title }}</h2>
+                {% endif %}
+                {% if page.voting_description %}
+                <div class="text-lg leading-relaxed mb-6" style="color:var(--theme-text-light)">
+                    {{ page.voting_description|richtext }}
+                </div>
+                {% endif %}
+
+                {% if page.voting_deadline %}
+                <div class="mb-6" x-data="countdown('{{ page.voting_deadline|date:"c" }}')">
+                    <div class="flex gap-4">
+                        <div class="countdown-box">
+                            <div class="countdown-value" x-text="String(days).padStart(2,'0')"></div>
+                            <div class="countdown-label">Days</div>
+                        </div>
+                        <div class="countdown-box">
+                            <div class="countdown-value" x-text="String(hours).padStart(2,'0')"></div>
+                            <div class="countdown-label">Hours</div>
+                        </div>
+                        <div class="countdown-box">
+                            <div class="countdown-value" x-text="String(minutes).padStart(2,'0')"></div>
+                            <div class="countdown-label">Min</div>
+                        </div>
                     </div>
+                </div>
+                {% endif %}
+
+                {% if page.voting_button_text %}
+                <a href="{{ page.voting_button_url|default:'#' }}" class="btn-gold">
+                    {{ page.voting_button_text }}
+                </a>
+                {% endif %}
+            </div>
+
+            {# Illustration side #}
+            <div class="flex justify-center">
+                <img src="{% static 'assets/2026/svg/showing-support.svg' %}"
+                     alt="Online community illustration"
+                     class="section-illustration"
+                     style="max-width:360px">
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% if page.ticket_pricing %}
+<section class="section-2026 white-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {% if page.ticket_section_title %}
+        <h2 class="section-title-2026">{{ page.ticket_section_title }}</h2>
+        <p class="section-subtitle text-gray-500">Choose the pass that suits you best.</p>
+        {% endif %}
+
+        <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {% for ticket in page.ticket_pricing %}
+            <div class="ticket-card{% if forloop.counter == 2 %} ticket-featured{% endif %}">
+                {% if forloop.counter == 2 %}
+                <span class="ticket-featured-badge">Popular</span>
+                {% endif %}
+                <h3 class="text-xl font-bold mb-2" style="color:var(--theme-text)">{{ ticket.value.tier_name }}</h3>
+                <div class="ticket-price">{{ ticket.value.price }}</div>
+                <p class="text-gray-500 mb-6 text-sm leading-relaxed">{{ ticket.value.description }}</p>
+                {% if ticket.value.button_text %}
+                <a href="{{ ticket.value.button_url|default:'#' }}" class="ticket-btn">
+                    {{ ticket.value.button_text }}
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% if page.sponsors %}
+<section class="section-2026 light-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {% if page.sponsor_section_title %}
+        <h2 class="section-title-2026">{{ page.sponsor_section_title }}</h2>
+        {% endif %}
+
+        {% regroup page.sponsors by value.tier as sponsors_by_tier %}
+        {% for tier_group in sponsors_by_tier %}
+        <div class="mb-10">
+            <h3 class="sponsor-tier-title">{{ tier_group.grouper }}</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 items-center">
+                {% for sponsor in tier_group.list %}
+                <div class="sponsor-logo-card">
+                    {% if sponsor.value.website_url %}
+                    <a href="{{ sponsor.value.website_url }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center">
                     {% endif %}
-                    <h3 class="text-2xl font-bold mb-4 text-gray-900">
-                        {{ block.value.title }}
-                    </h3>
-                    <p class="text-gray-600 mb-6">
-                        {{ block.value.description }}
-                    </p>
-                    {% if block.value.link_url %}
-                    <a href="{{ block.value.link_url }}" 
-                       class="inline-flex items-center text-teal-600 hover:text-teal-700 font-bold">
-                        {{ block.value.link_text|default:"Learn More" }}
-                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-                        </svg>
+                        {% if sponsor.value.logo %}
+                        {% image sponsor.value.logo max-200x100 class="max-h-16 max-w-full object-contain" alt=sponsor.value.name %}
+                        {% else %}
+                        <span class="text-gray-600 font-medium text-sm">{{ sponsor.value.name }}</span>
+                        {% endif %}
+                    {% if sponsor.value.website_url %}
                     </a>
                     {% endif %}
                 </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-    </div>
-</section>
-{% endif %}
-
-<!-- Sponsors Section -->
-{% if page.sponsors %}
-<section class="py-24 bg-white">
-    <div class="max-w-7xl mx-auto px-4">
-        {% if page.sponsor_section_title %}
-        <h2 class="text-5xl font-black text-center mb-16 text-gray-900">
-            {{ page.sponsor_section_title }}
-        </h2>
-        {% endif %}
-        
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {% for block in page.sponsors %}
-            <div class="flex items-center justify-center p-6 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-                {% if block.value.logo %}
-                <img src="{{ block.value.logo.file.url }}" 
-                     alt="{{ block.value.name }}"
-                     class="max-w-full h-auto max-h-24">
-                {% else %}
-                <div class="text-center">
-                    <p class="font-bold text-gray-900">{{ block.value.name }}</p>
-                    <p class="text-sm text-gray-600">{{ block.value.get_tier_display }}</p>
-                </div>
-                {% endif %}
+                {% endfor %}
             </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if page.year_navigation_title %}
+<section class="section-2026 dark-section relative overflow-hidden">
+    {# Decorative stars illustration — background, faded #}
+    <img src="{% static 'assets/2026/svg/stars.svg' %}"
+         alt="" aria-hidden="true"
+         class="absolute right-0 top-1/2 -translate-y-1/2 opacity-10 pointer-events-none"
+         style="max-width:420px">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <h2 class="section-title-2026">{{ page.year_navigation_title }}</h2>
+        {% if page.year_navigation_description %}
+        <div class="section-subtitle" style="color:var(--theme-text-light)">
+            {{ page.year_navigation_description|richtext }}
+        </div>
+        {% endif %}
+
+        {% if available_years %}
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {% for year, info in available_years.items %}
+            <a href="{% if year == current_year %}/{% else %}/{{ year }}/{% endif %}"
+               class="year-card block text-center{% if year == conference_year %} year-current{% endif %}">
+                <span class="block text-3xl font-extrabold mb-1 {% if year == conference_year %}text-[#F59E0B]{% else %}text-white{% endif %}">
+                    {{ year }}
+                </span>
+                <span class="block text-sm" style="color:var(--theme-text-light)">{{ info.name }}</span>
+                {% if year == current_year %}
+                <span class="inline-block mt-2 text-xs px-3 py-1 rounded-full bg-[#F59E0B] text-[#0B1F24] font-bold">Current</span>
+                {% endif %}
+            </a>
             {% endfor %}
         </div>
+        {% endif %}
     </div>
 </section>
 {% endif %}
 
-<!-- Footer Note (for archived years) -->
-{% if page.conference_year and page.conference_year != current_year %}
-<section class="bg-teal-600 text-white py-12">
-    <div class="max-w-7xl mx-auto px-4 text-center">
-        <p class="text-xl mb-4">
-            📦 This is an archived page for PyCon Nigeria {{ page.conference_year }}
-        </p>
-        <a href="/" class="inline-block bg-white text-teal-600 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition-colors">
-            Visit Current Conference →
-        </a>
-    </div>
-</section>
-{% endif %}
+{% endblock %}
 
+{% block footer %}
+<footer class="footer-2026">
+
+    {% if page.newsletter_title %}
+    <div class="dark-section" style="padding:4rem 0 3rem">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="section-title-2026 text-2xl md:text-3xl mb-2" style="color:#fff">{{ page.newsletter_title }}</h2>
+            {% if page.newsletter_description %}
+            <p class="mb-6 text-base" style="color:var(--theme-text-light);max-width:480px;margin-left:auto;margin-right:auto">
+                {{ page.newsletter_description }}
+            </p>
+            {% endif %}
+            <form id="newsletter-form" class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
+                  data-ajax="true" action="{% url 'newsletter_signup' %}" method="post">
+                {% csrf_token %}
+                <input type="email" name="email" id="newsletter-email"
+                       placeholder="you@example.com" required
+                       class="newsletter-input flex-1 rounded-full">
+                <button type="submit" class="btn-gold px-6 py-3 text-sm">Subscribe</button>
+            </form>
+            <div id="newsletter-message" class="mt-3 text-sm"></div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div style="background-color:var(--theme-dark);padding:3rem 0 2rem;border-top:1px solid rgba(255,255,255,0.07)">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                {# Brand column #}
+                <div>
+                    <h3 class="text-xl font-bold mb-3 text-white">{{ site_name }}</h3>
+                    <p class="text-sm" style="color:var(--theme-text-light)">
+                        {{ site_tagline|default:"The premier Python conference in Nigeria." }}
+                    </p>
+                </div>
+
+                {# Footer links column #}
+                <div>
+                    <h4 class="font-semibold mb-3 text-white">Links</h4>
+                    <ul class="space-y-2 text-sm">
+                        {% if page.footer_links %}
+                            {% for link in page.footer_links %}
+                                {% if link.block_type == 'link' %}
+                                <li><a href="{{ link.value.url }}">{{ link.value.label }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <li><a href="/privacy/">Privacy Policy</a></li>
+                            <li><a href="/faqs/">FAQs</a></li>
+                            <li><a href="/contact/">Contact</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                {# Social media column #}
+                <div>
+                    <h4 class="font-semibold mb-3 text-white">Follow Us</h4>
+                    <div class="flex flex-wrap gap-4">
+                        {% if page.twitter_url %}
+                        <a href="{{ page.twitter_url }}" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="Twitter">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/></svg>
+                        </a>
+                        {% endif %}
+                        {% if page.facebook_url %}
+                        <a href="{{ page.facebook_url }}" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="Facebook">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                        </a>
+                        {% endif %}
+                        {% if page.linkedin_url %}
+                        <a href="{{ page.linkedin_url }}" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="LinkedIn">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+                        </a>
+                        {% endif %}
+                        {% if page.instagram_url %}
+                        <a href="{{ page.instagram_url }}" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="Instagram">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                        </a>
+                        {% endif %}
+                        {% if page.youtube_url %}
+                        <a href="{{ page.youtube_url }}" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="YouTube">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
+                        </a>
+                        {% endif %}
+                        {% if page.github_url %}
+                        <a href="{{ page.github_url }}" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="GitHub">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# Copyright bar #}
+            <div class="border-t border-white/10 pt-6 text-center text-sm" style="color:var(--theme-text-light)">
+                {{ page.footer_copyright|default:"&copy; PyCon Nigeria. All rights reserved." }}
+            </div>
+        </div>
+    </div>
+</footer>
 {% endblock %}

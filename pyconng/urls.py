@@ -23,6 +23,12 @@ urlpatterns = [
     path("accounts/login/", LoginView.as_view(), name="login"),
     path("accounts/logout/", LogoutView.as_view(), name="logout"),
     
+    # Tickets (must be before Wagtail catch-all)
+    path("tickets/", include("tickets.urls")),
+    
+    # CFP (must be before Wagtail catch-all)
+    path("cfp/", include("cfp.urls")),
+    
     # Year-specific routing using custom view. Past years are read-only snapshots.
     path("<int:year>/search/", search_views.search, name="year_search"),
     path("<int:year>/", year_page_serve, {'path': ''}, name="year_home"),

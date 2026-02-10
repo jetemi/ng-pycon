@@ -1,0 +1,349 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Purchase Tickets - PyCon Nigeria {{ conference_year }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    [x-cloak] { display: none !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4"
+     x-data="purchaseApp()" x-cloak>
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Page Header -->
+        <div class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Purchase Tickets</h1>
+            <p class="text-gray-600">PyCon Nigeria {{ conference_year }}</p>
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="flex items-center justify-center mb-10">
+            <div class="flex items-center space-x-4">
+                <div :class="step === 1 ? 'bg-teal-600 text-white' : 'bg-teal-100 text-teal-700'" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors">1</div>
+                <span class="text-sm text-gray-500">Your Info</span>
+                <div class="w-12 h-0.5 bg-gray-300"></div>
+                <div :class="step === 2 ? 'bg-teal-600 text-white' : 'bg-gray-200 text-gray-500'" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors">2</div>
+                <span class="text-sm text-gray-500">Select & Pay</span>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="mb-6">
+            {% for message in messages %}
+            <div class="p-4 rounded-lg mb-2 {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200{% elif message.tags == 'success' or message.tags == 'info' %}bg-green-50 text-green-700 border border-green-200{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Step 1: User Info -->
+        <div x-show="step === 1" x-transition class="bg-white rounded-2xl shadow-lg p-8">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">Your Information</h2>
+            
+            <div id="error-section" x-show="showError" class="p-4 bg-red-50 text-red-700 rounded-lg mb-6 border border-red-200">
+                Please fill in all required fields.
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                    <input type="text" x-model="firstName" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                           placeholder="First name" value="{{ user_first_name }}">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                    <input type="text" x-model="lastName"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                           placeholder="Last name" value="{{ user_last_name }}">
+                </div>
+            </div>
+            <div class="mb-8">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input type="email" x-model="email" readonly
+                       class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-600"
+                       value="{{ user_email }}">
+                <p class="text-xs text-gray-400 mt-1">This is your account email and cannot be changed here.</p>
+            </div>
+            
+            <div class="flex justify-end">
+                <button @click="toStep2()" 
+                        class="px-8 py-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg transition-colors duration-200">
+                    Continue to Ticket Selection
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 2: Ticket Selection & Payment -->
+        <div x-show="step === 2" x-transition class="space-y-6">
+            <!-- Ticket Selection -->
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <h2 class="text-xl font-bold text-gray-900 mb-6">Select Your Tickets</h2>
+                
+                <div class="space-y-4">
+                    {% for ticket in tickets %}
+                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-teal-300 transition-colors" id="{{ ticket.short_name }}">
+                        <div class="flex-grow">
+                            <h3 class="font-semibold text-gray-900">{{ ticket.name }}</h3>
+                            <p class="text-teal-600 font-bold">&#8358;<span x-text="Number({{ ticket.amount }}).toLocaleString()">{{ ticket.amount }}</span></p>
+                            {% if ticket.remaining %}
+                            <p class="text-xs text-gray-400">{{ ticket.remaining }} remaining</p>
+                            {% endif %}
+                        </div>
+                        <div class="w-24">
+                            <select @change="calculateTotal()"
+                                    x-model="quantities['{{ ticket.short_name }}']"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 text-center">
+                                {% for i in "0123456789" %}
+                                <option value="{{ forloop.counter0 }}">{{ forloop.counter0 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Coupon Section -->
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <div x-show="!showCouponInput && discount === 0">
+                    <button @click="showCouponInput = true" class="text-teal-600 hover:text-teal-700 text-sm font-medium underline">
+                        Have a discount code?
+                    </button>
+                </div>
+                
+                <div x-show="showCouponInput && discount === 0" x-transition class="flex items-end gap-4">
+                    <div class="flex-grow">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Coupon Code</label>
+                        <input type="text" x-model="couponCode"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                               placeholder="Enter coupon code">
+                    </div>
+                    <button @click="validateCoupon()" 
+                            class="px-6 py-3 bg-gray-800 hover:bg-gray-900 text-white font-medium rounded-lg transition-colors">
+                        Apply
+                    </button>
+                </div>
+
+                <div x-show="discount > 0" x-transition class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div>
+                        <span class="text-green-700 font-medium">Discount applied!</span>
+                        <span class="text-green-600 font-bold ml-2" x-text="discount + '% off'"></span>
+                    </div>
+                    <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <h2 class="text-xl font-bold text-gray-900 mb-6">Order Summary</h2>
+                
+                <div class="space-y-3 mb-6">
+                    <div class="flex justify-between text-gray-600">
+                        <span>Tickets</span>
+                        <span x-text="ticketCount + ' ticket(s)'">0 ticket(s)</span>
+                    </div>
+                    <template x-if="discount > 0">
+                        <div class="flex justify-between text-green-600">
+                            <span>Discount</span>
+                            <span x-text="'-' + discount + '%'"></span>
+                        </div>
+                    </template>
+                    <div class="border-t border-gray-200 pt-3">
+                        <div class="flex justify-between text-xl font-bold text-gray-900">
+                            <span>Total</span>
+                            <span>&#8358;<span x-text="Number(total).toLocaleString()">0</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Code of Conduct -->
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" x-model="cocAccepted"
+                               @change="calculateTotal()"
+                               class="w-5 h-5 mt-0.5 text-teal-600 border-gray-300 rounded focus:ring-teal-500">
+                        <span class="text-sm text-gray-700">
+                            I have read and agree to the 
+                            <a href="#" class="text-teal-600 underline hover:text-teal-700">Code of Conduct</a>
+                            and
+                            <a href="#" class="text-teal-600 underline hover:text-teal-700">Terms & Conditions</a>.
+                        </span>
+                    </label>
+                </div>
+
+                <!-- Pay Button -->
+                <button @click="payWithPaystack()"
+                        :disabled="!canPay"
+                        :class="canPay ? 'bg-teal-600 hover:bg-teal-700 cursor-pointer' : 'bg-gray-300 cursor-not-allowed'"
+                        class="w-full py-4 text-white font-bold rounded-lg text-lg transition-colors duration-200 flex items-center justify-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                    <span x-text="processing ? 'Processing...' : 'Pay Now with Paystack'">Pay Now with Paystack</span>
+                </button>
+
+                <div class="mt-4 flex items-center justify-center space-x-2 text-xs text-gray-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                    <span>Secured by Paystack</span>
+                </div>
+            </div>
+
+            <!-- Back button -->
+            <div class="text-center">
+                <button @click="step = 1" class="text-gray-500 hover:text-gray-700 text-sm underline">
+                    Back to your information
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://js.paystack.co/v2/inline.js"></script>
+<script>
+function purchaseApp() {
+    return {
+        step: 1,
+        firstName: '{{ user_first_name|escapejs }}',
+        lastName: '{{ user_last_name|escapejs }}',
+        email: '{{ user_email|escapejs }}',
+        quantities: {
+            {% for ticket in tickets %}
+            '{{ ticket.short_name }}': '0'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        },
+        pricings: {{ pricings_json|safe }},
+        couponCode: '',
+        discount: 0,
+        showCouponInput: false,
+        cocAccepted: false,
+        total: 0,
+        ticketCount: 0,
+        processing: false,
+        showError: false,
+
+        get canPay() {
+            return this.total > 0 && this.cocAccepted && !this.processing;
+        },
+
+        toStep2() {
+            if (this.firstName && this.lastName && this.email) {
+                this.showError = false;
+                this.step = 2;
+            } else {
+                this.showError = true;
+            }
+        },
+
+        calculateTotal() {
+            let subtotal = 0;
+            let count = 0;
+            for (const [name, qty] of Object.entries(this.quantities)) {
+                const price = this.pricings[name] || 0;
+                const q = parseInt(qty) || 0;
+                subtotal += price * q;
+                count += q;
+            }
+            const discountAmount = subtotal * this.discount / 100;
+            this.total = subtotal - discountAmount;
+            this.ticketCount = count;
+        },
+
+        async validateCoupon() {
+            if (!this.couponCode.trim()) return;
+            try {
+                const resp = await fetch(`{% url 'tickets:coupons' %}?value=${encodeURIComponent(this.couponCode)}`);
+                const data = await resp.json();
+                if (data.status > 0) {
+                    this.discount = data.status;
+                    this.calculateTotal();
+                } else {
+                    alert('Invalid or expired coupon code.');
+                    this.showCouponInput = false;
+                }
+            } catch (e) {
+                console.error('Coupon validation error:', e);
+            }
+        },
+
+        async payWithPaystack() {
+            if (!this.canPay) return;
+            this.processing = true;
+
+            try {
+                // 1. Create ticket order on backend
+                const orderResp = await fetch('{% url "tickets:purchase" %}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        coupon: this.couponCode,
+                        tickets: this.quantities,
+                    }),
+                });
+                const orderData = await orderResp.json();
+
+                if (orderData.error) {
+                    alert('Error: ' + JSON.stringify(orderData.error));
+                    this.processing = false;
+                    return;
+                }
+
+                const order = orderData.order;
+                const total = orderData.total;
+
+                // 2. Open Paystack payment popup
+                const handler = PaystackPop.setup({
+                    key: '{{ public_key }}',
+                    email: this.email,
+                    amount: Math.round(total * 100),  // Convert to kobo
+                    ref: order,
+                    metadata: {
+                        custom_fields: [{
+                            display_name: "Name",
+                            variable_name: "name",
+                            value: this.firstName + ' ' + this.lastName,
+                        }]
+                    },
+                    callback: async (response) => {
+                        // 3. Verify payment
+                        try {
+                            const validateResp = await fetch(`/tickets/paystack/validate/${order}/${response.reference}/`);
+                            const validateData = await validateResp.json();
+                            if (validateData.status) {
+                                window.location.href = `/tickets/purchase-complete/${order}/`;
+                            } else {
+                                alert('Could not verify transaction. Please contact support.');
+                                this.processing = false;
+                            }
+                        } catch (e) {
+                            alert('Verification error. Please contact support.');
+                            this.processing = false;
+                        }
+                    },
+                    onClose: () => {
+                        this.processing = false;
+                    },
+                });
+                handler.openIframe();
+            } catch (e) {
+                console.error('Payment error:', e);
+                alert('An error occurred. Please try again.');
+                this.processing = false;
+            }
+        },
+    };
+}
+</script>
+{% endblock %}

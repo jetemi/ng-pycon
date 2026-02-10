@@ -1,0 +1,76 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Complete Ticket - PyCon Nigeria{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4">
+    <div class="max-w-2xl mx-auto">
+        <!-- Page Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Complete Your Ticket</h1>
+            <p class="text-gray-600">
+                Fill in the attendee details for your
+                {% if object.ticket_type %}{{ object.ticket_type.name }}{% endif %}
+                ticket{% if object.quantity > 1 %}s ({{ object.quantity }} ticket{{ object.quantity|pluralize }}){% endif %}.
+            </p>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="mb-6">
+            {% for message in messages %}
+            <div class="p-4 rounded-lg mb-2 {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-green-50 text-green-700 border border-green-200{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Ticket Form -->
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+            <div class="mb-6 p-4 bg-teal-50 border border-teal-200 rounded-lg">
+                <p class="text-teal-800 text-sm">
+                    <strong>Note:</strong> These details will be applied to all {{ object.quantity }} ticket{{ object.quantity|pluralize }} in this order. You can edit individual tickets afterwards.
+                </p>
+            </div>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <div>
+                    <label for="id_full_name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    {{ ticket_form.full_name }}
+                    {% if ticket_form.full_name.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ ticket_form.full_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="id_tagline" class="block text-sm font-medium text-gray-700 mb-2">Tagline</label>
+                    {{ ticket_form.tagline }}
+                    <p class="text-xs text-gray-400 mt-1">This will appear on your conference badge (e.g. "Python Developer", "Data Scientist")</p>
+                    {% if ticket_form.tagline.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ ticket_form.tagline.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="id_diet" class="block text-sm font-medium text-gray-700 mb-2">Dietary Preference</label>
+                    {{ ticket_form.diet }}
+                    {% if ticket_form.diet.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ ticket_form.diet.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit"
+                            class="w-full py-3 px-6 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg transition-colors duration-200">
+                        Save Ticket Details
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

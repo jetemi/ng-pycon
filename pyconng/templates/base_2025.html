@@ -1,0 +1,174 @@
+{% load static wagtailcore_tags wagtailuserbar %}
+
+<!DOCTYPE html>
+<html lang="en" x-data="theme('{{ conference_theme }}')" :data-theme="currentTheme">
+    <head>
+        <meta charset="utf-8" />
+        <title>
+            {% block title %}
+            {% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}
+            {% endblock %}
+            {% block title_suffix %}
+            {% if site_name %} - {{ site_name }} {{ conference_year }}{% endif %}
+            {% endblock %}
+        </title>
+        {% if page.search_description %}
+        <meta name="description" content="{{ page.search_description }}" />
+        {% endif %}
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        {% if request.in_preview_panel %}
+        <base target="_blank">
+        {% endif %}
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+        <link rel="stylesheet" type="text/css" href="{% static 'css/pyconng.css' %}">
+        
+        {% comment %}Load theme-specific CSS based on conference year{% endcomment %}
+        {% if conference_theme %}
+        <link rel="stylesheet" href="{% static 'css/src/themes/' %}{{ conference_theme }}.css">
+        {% endif %}
+
+        {% block extra_css %}{% endblock %}
+
+        <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+        <meta name="theme-color" content="{{ conference_year_info.colors.0 }}">
+        
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="{% block og_title %}{% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %} - {{ site_name }} {{ conference_year }}{% endblock %}">
+        <meta property="og:description" content="{% block og_description %}{{ page.search_description|default:'PyCon Nigeria - The premier Python conference in Nigeria' }}{% endblock %}">
+        <meta property="og:image" content="{% block og_image %}{% static 'images/og-image.jpg' %}{% endblock %}">
+        
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:title" content="{% block twitter_title %}{% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %} - {{ site_name }} {{ conference_year }}{% endblock %}">
+        <meta property="twitter:description" content="{% block twitter_description %}{{ page.search_description|default:'PyCon Nigeria - The premier Python conference in Nigeria' }}{% endblock %}">
+        <meta property="twitter:image" content="{% block twitter_image %}{% static 'images/og-image.jpg' %}{% endblock %}">
+        
+        <meta name="conference-year" content="{{ conference_year }}">
+        <meta name="conference-theme" content="{{ conference_theme }}">
+        <meta name="conference-name" content="{{ conference_year_info.name }}">
+        <meta name="current-year" content="{{ current_year }}">
+    </head>
+
+    <body class="{% block body_class %}{% endblock %}{% if conference_theme %} theme-{{ conference_theme }}{% endif %} font-sans antialiased bg-gray-50 text-gray-900">
+        {% wagtailuserbar %}
+
+        {% block header %}
+        <header class="theme-nav" x-data="navigation()">
+            <div class="theme-container">
+                <nav class="flex items-center justify-between py-4">
+                    <div class="flex items-center">
+                        <a href="{% if is_current_year %}/{% else %}/{{ conference_year }}/{% endif %}" class="text-2xl font-bold text-theme-primary">
+                            {{ site_name }}
+                        </a>
+                    </div>
+                    
+                    <div class="hidden md:flex items-center space-x-6">
+                        {% if navigation_menu_items %}
+                            {% for item in navigation_menu_items %}
+                                {% if item.block_type == 'menu_item' %}
+                                <a href="{{ item.value.link_url }}" class="theme-nav-link">
+                                    {{ item.value.label }}
+                                </a>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <a href="{% if is_current_year %}/{% else %}/{{ conference_year }}/{% endif %}" class="theme-nav-link">Home</a>
+                            <a href="{% if is_current_year %}/tickets/{% else %}/{{ conference_year }}/tickets/{% endif %}" class="theme-nav-link">Tickets</a>
+                            <a href="{% if is_current_year %}/schedule/{% else %}/{{ conference_year }}/schedule/{% endif %}" class="theme-nav-link">Schedule</a>
+                            <a href="{% if is_current_year %}/speakers/{% else %}/{{ conference_year }}/speakers/{% endif %}" class="theme-nav-link">Speakers</a>
+                            <a href="{% if is_current_year %}/sponsors/{% else %}/{{ conference_year }}/sponsors/{% endif %}" class="theme-nav-link">Sponsors</a>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        {% comment %}Only show auth for current year{% endcomment %}
+                        {% if is_current_year %}
+                            {% if user.is_authenticated %}
+                            <a href="{% url 'logout' %}" class="theme-nav-link">Sign Out</a>
+                            {% else %}
+                            <a href="{% url 'signup' %}" class="theme-nav-link">Sign Up</a>
+                            <a href="{% url 'login' %}" class="theme-button">
+                                Sign In
+                            </a>
+                            {% endif %}
+                        {% else %}
+                            {% comment %}For archived years, show archive indicator{% endcomment %}
+                            {% if page_conference_year or conference_year != current_year %}
+                            <span class="text-sm px-3 py-1 bg-gray-200 text-gray-700 rounded-full">
+                                {{ conference_year }} Archive
+                            </span>
+                            {% endif %}
+                        {% endif %}
+                        
+                        <button @click="toggle()" class="md:hidden text-theme-primary focus:outline-none">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </nav>
+                
+                <div x-show="isOpen" @click.away="close()" x-transition class="md:hidden pb-4">
+                    <div class="flex flex-col space-y-2">
+                        {% if navigation_menu_items %}
+                            {% for item in navigation_menu_items %}
+                                {% if item.block_type == 'menu_item' %}
+                                <a href="{{ item.value.link_url }}" class="theme-nav-link block">
+                                    {{ item.value.label }}
+                                </a>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <a href="{% if is_current_year %}/{% else %}/{{ conference_year }}/{% endif %}" class="theme-nav-link block">Home</a>
+                            <a href="{% if is_current_year %}/tickets/{% else %}/{{ conference_year }}/tickets/{% endif %}" class="theme-nav-link block">Tickets</a>
+                            <a href="{% if is_current_year %}/schedule/{% else %}/{{ conference_year }}/schedule/{% endif %}" class="theme-nav-link block">Schedule</a>
+                            <a href="{% if is_current_year %}/speakers/{% else %}/{{ conference_year }}/speakers/{% endif %}" class="theme-nav-link block">Speakers</a>
+                            <a href="{% if is_current_year %}/sponsors/{% else %}/{{ conference_year }}/sponsors/{% endif %}" class="theme-nav-link block">Sponsors</a>
+                        {% endif %}
+                        {% comment %}Only show auth for current year{% endcomment %}
+                        {% if is_current_year %}
+                        <div class="pt-4 border-t border-gray-200 mt-2">
+                            {% if user.is_authenticated %}
+                            <a href="{% url 'logout' %}" class="theme-nav-link block">Sign Out</a>
+                            {% else %}
+                            <a href="{% url 'signup' %}" class="theme-nav-link block">Sign Up</a>
+                            <a href="{% url 'login' %}" class="theme-button block text-center mt-2">Sign In</a>
+                            {% endif %}
+                        </div>
+                        {% elif page_conference_year or conference_year != current_year %}
+                        <div class="pt-4 border-t border-gray-200 mt-2">
+                            <span class="text-sm px-3 py-1 bg-gray-200 text-gray-700 rounded-full block text-center">
+                                {{ conference_year }} Archive
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </header>
+        {% endblock %}
+
+        {% block content %}{% endblock %}
+
+        {% block footer %}{% endblock %}
+
+        <script type="importmap">
+        {
+            "imports": {
+                "alpinejs": "https://cdn.jsdelivr.net/npm/alpinejs@3/dist/module.esm.js"
+            }
+        }
+        </script>
+        <script type="module" src="{% static 'js/pyconng.js' %}"></script>
+        
+        {% comment %}Load theme-specific JS based on conference year{% endcomment %}
+        {% if conference_theme %}
+        <script src="{% static 'js/themes/' %}{{ conference_theme }}.js" defer></script>
+        {% endif %}
+
+        {% block extra_js %}{% endblock %}
+    </body>
+</html>

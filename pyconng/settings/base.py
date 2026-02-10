@@ -33,6 +33,8 @@ sys.path.insert(0, os.path.join(PROJECT_DIR, 'apps'))
 INSTALLED_APPS = [
     "home",
     "search",
+    "tickets",
+    "cfp",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
     "wagtail.embeds",
@@ -84,6 +86,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "pyconng.context_processors.conference_context",
                 "pyconng.context_processors.site_context",
+                "pyconng.context_processors.navigation_context",
             ],
         },
     },
@@ -215,3 +218,8 @@ WAGTAILDOCS_EXTENSIONS = ['csv', 'docx', 'key', 'odt', 'pdf', 'pptx', 'rtf', 'tx
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+# Paystack settings
+PAYSTACK_BASE_URL = os.getenv("PAYSTACK_BASE_URL", "https://api.paystack.co")
+PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY", "sk_test_xxxxx")
+PAYSTACK_PUBLIC_KEY = os.getenv("PAYSTACK_PUBLIC_KEY", "pk_test_xxxxx")

@@ -1,0 +1,130 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Status: {{ proposal.title }} - PyCon Nigeria {{ conference_year }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+
+    <section class="py-12 px-4">
+        <div class="max-w-2xl mx-auto">
+
+            <a href="{% url 'cfp:my_proposals' %}" class="text-sm text-teal-600 hover:text-teal-700 font-medium mb-6 inline-block">
+                &larr; Back to My Proposals
+            </a>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ proposal.title }}</h1>
+
+                <div class="mt-6">
+                    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Current Status</h2>
+
+                    {% if proposal.status == 'draft' %}
+                    <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                        <span class="w-3 h-3 bg-gray-400 rounded-full"></span>
+                        <div>
+                            <p class="font-semibold text-gray-700">Draft</p>
+                            <p class="text-sm text-gray-500">Your proposal has not been submitted yet.</p>
+                        </div>
+                    </div>
+
+                    {% elif proposal.status == 'submitted' %}
+                    <div class="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
+                        <span class="w-3 h-3 bg-blue-500 rounded-full"></span>
+                        <div>
+                            <p class="font-semibold text-blue-700">Submitted</p>
+                            <p class="text-sm text-blue-600">Your proposal has been received and is awaiting review.</p>
+                        </div>
+                    </div>
+
+                    {% elif proposal.status == 'under_review' %}
+                    <div class="flex items-center gap-3 p-4 bg-yellow-50 rounded-lg">
+                        <span class="w-3 h-3 bg-yellow-500 rounded-full animate-pulse"></span>
+                        <div>
+                            <p class="font-semibold text-yellow-700">Under Review</p>
+                            <p class="text-sm text-yellow-600">Your proposal is currently being reviewed by our committee.</p>
+                        </div>
+                    </div>
+
+                    {% elif proposal.status == 'accepted' %}
+                    <div class="flex items-center gap-3 p-4 bg-green-50 rounded-lg">
+                        <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+                        <div>
+                            <p class="font-semibold text-green-700">Accepted!</p>
+                            <p class="text-sm text-green-600">Congratulations! Your proposal has been accepted. Please confirm below.</p>
+                        </div>
+                    </div>
+                    <form method="post" action="{% url 'cfp:proposal_confirm' proposal_id=proposal.pk %}" class="mt-4">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="w-full py-3 px-6 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors duration-200">
+                            Confirm My Participation
+                        </button>
+                    </form>
+
+                    {% elif proposal.status == 'rejected' %}
+                    <div class="flex items-center gap-3 p-4 bg-red-50 rounded-lg">
+                        <span class="w-3 h-3 bg-red-500 rounded-full"></span>
+                        <div>
+                            <p class="font-semibold text-red-700">Not Accepted</p>
+                            <p class="text-sm text-red-600">Unfortunately your proposal was not selected this time. Thank you for submitting!</p>
+                        </div>
+                    </div>
+
+                    {% elif proposal.status == 'waitlisted' %}
+                    <div class="flex items-center gap-3 p-4 bg-amber-50 rounded-lg">
+                        <span class="w-3 h-3 bg-amber-500 rounded-full"></span>
+                        <div>
+                            <p class="font-semibold text-amber-700">Waitlisted</p>
+                            <p class="text-sm text-amber-600">Your proposal is on the waitlist. We'll contact you if a slot becomes available.</p>
+                        </div>
+                    </div>
+
+                    {% elif proposal.status == 'withdrawn' %}
+                    <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                        <span class="w-3 h-3 bg-gray-400 rounded-full"></span>
+                        <div>
+                            <p class="font-semibold text-gray-700">Withdrawn</p>
+                            <p class="text-sm text-gray-500">You withdrew this proposal.</p>
+                        </div>
+                    </div>
+
+                    {% elif proposal.status == 'confirmed' %}
+                    <div class="flex items-center gap-3 p-4 bg-emerald-50 rounded-lg">
+                        <span class="w-3 h-3 bg-emerald-500 rounded-full"></span>
+                        <div>
+                            <p class="font-semibold text-emerald-700">Confirmed</p>
+                            <p class="text-sm text-emerald-600">You've confirmed your participation. See you at PyCon Nigeria!</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Timeline -->
+                <div class="mt-8 pt-6 border-t border-gray-100">
+                    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Timeline</h2>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Created</span>
+                            <span class="text-gray-400">{{ proposal.created_at|date:"M j, Y g:i A" }}</span>
+                        </div>
+                        {% if proposal.submitted_at %}
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Submitted</span>
+                            <span class="text-gray-400">{{ proposal.submitted_at|date:"M j, Y g:i A" }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Last updated</span>
+                            <span class="text-gray-400">{{ proposal.updated_at|date:"M j, Y g:i A" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+</div>
+{% endblock %}

@@ -1,0 +1,140 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Call for Proposals - PyCon Nigeria {{ conference_year }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+
+    <!-- Hero -->
+    <section class="py-16 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                Call for Proposals
+            </h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-6">
+                PyCon Nigeria {{ conference_year }} — Share your knowledge, inspire the community.
+            </p>
+
+            {% if cfp and cfp.is_open %}
+                <div class="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-semibold mb-6">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    CFP is Open — Deadline: {{ cfp.submission_deadline|date:"F j, Y g:i A" }}
+                </div>
+            {% elif cfp and cfp.status == 'closed' %}
+                <div class="inline-flex items-center gap-2 bg-red-100 text-red-800 px-4 py-2 rounded-full text-sm font-semibold mb-6">
+                    <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+                    CFP is Closed
+                </div>
+            {% elif cfp and cfp.status == 'draft' %}
+                <div class="inline-flex items-center gap-2 bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full text-sm font-semibold mb-6">
+                    <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                    CFP Coming Soon
+                </div>
+            {% else %}
+                <div class="inline-flex items-center gap-2 bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm font-semibold mb-6">
+                    CFP has not been configured yet.
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Guidelines -->
+    {% if cfp and cfp.guidelines %}
+    <section class="pb-12 px-4">
+        <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Submission Guidelines</h2>
+            <div class="prose prose-gray max-w-none text-gray-700">{{ cfp.guidelines|safe }}</div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if cfp and cfp.is_open %}
+    <section class="pb-12 px-4">
+        <div class="max-w-3xl mx-auto text-center">
+            <a href="{% url 'cfp:submit' %}"
+               class="inline-block px-10 py-4 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg transition-colors duration-200 text-lg shadow-md hover:shadow-lg">
+                Submit a Proposal
+            </a>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Talk Formats -->
+    <section class="pb-12 px-4">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Talk Formats</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 text-center">
+                    <div class="text-3xl mb-3">🎤</div>
+                    <h3 class="font-semibold text-gray-900 mb-1">Talk</h3>
+                    <p class="text-sm text-gray-500">Standard conference talk</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 text-center">
+                    <div class="text-3xl mb-3">🛠️</div>
+                    <h3 class="font-semibold text-gray-900 mb-1">Workshop</h3>
+                    <p class="text-sm text-gray-500">Hands-on session</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 text-center">
+                    <div class="text-3xl mb-3">📚</div>
+                    <h3 class="font-semibold text-gray-900 mb-1">Tutorial</h3>
+                    <p class="text-sm text-gray-500">In-depth tutorial</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 text-center">
+                    <div class="text-3xl mb-3">⚡</div>
+                    <h3 class="font-semibold text-gray-900 mb-1">Lightning Talk</h3>
+                    <p class="text-sm text-gray-500">Quick 5-minute talk</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tracks -->
+    {% if tracks %}
+    <section class="pb-12 px-4">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Tracks</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for track in tracks %}
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                    <h3 class="font-semibold text-gray-900 mb-1">{{ track.name }}</h3>
+                    {% if track.description %}
+                    <p class="text-sm text-gray-500">{{ track.description }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Durations -->
+    {% if cfp and cfp.allowed_durations %}
+    <section class="pb-12 px-4">
+        <div class="max-w-3xl mx-auto text-center">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Duration Options</h2>
+            <div class="flex flex-wrap justify-center gap-3">
+                {% for d in cfp.allowed_durations %}
+                <span class="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700">
+                    {{ d }} min
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Speaker access -->
+    <section class="pb-20 px-4">
+        <div class="max-w-3xl mx-auto text-center">
+            <p class="text-gray-600">
+                Already submitted a proposal?
+                <a href="{% url 'cfp:access' %}" class="text-teal-600 hover:text-teal-700 font-semibold underline">
+                    Access your proposals
+                </a>
+            </p>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

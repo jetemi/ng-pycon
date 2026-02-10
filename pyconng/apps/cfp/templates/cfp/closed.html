@@ -1,0 +1,37 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}CFP Closed - PyCon Nigeria {{ conference_year }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4">
+    <div class="max-w-lg text-center">
+        <div class="text-gray-300 mb-6">
+            <svg class="w-20 h-20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">CFP is Closed</h1>
+        <p class="text-gray-600 mb-2">
+            The Call for Proposals for PyCon Nigeria {{ conference_year }} is no longer accepting submissions.
+        </p>
+        {% if cfp and cfp.submission_deadline %}
+        <p class="text-sm text-gray-400 mb-8">
+            Deadline was {{ cfp.submission_deadline|date:"F j, Y g:i A" }}
+        </p>
+        {% endif %}
+
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="{% url 'cfp:access' %}"
+               class="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg transition-colors duration-200">
+                Check My Proposals
+            </a>
+            <a href="{% url 'cfp:landing' %}"
+               class="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                Back to CFP
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -260,26 +260,27 @@
     </div>
 </section> -->
 
-{% if page.ticket_pricing %}
+{% if ticket_types %}
 <section class="theme-section">
     <div class="theme-container">
-        {% if page.ticket_section_title %}
-        <h2 class="theme-heading text-4xl text-center mb-12">{{ page.ticket_section_title }}</h2>
-        {% endif %}
+        <h2 class="theme-heading text-4xl text-center mb-12">Tickets</h2>
         <div class="grid md:grid-cols-3 gap-8">
-            {% for ticket in page.ticket_pricing %}
-                {% if ticket.block_type == 'ticket' %}
-                <div class="theme-card text-center">
-                    <h3 class="theme-heading text-2xl mb-4">{{ ticket.value.tier_name }}</h3>
-                    <div class="text-4xl font-bold text-theme-primary mb-4">{{ ticket.value.price }}</div>
-                    <p class="text-gray-600 mb-6">{{ ticket.value.description }}</p>
-                    {% if ticket.value.button_text %}
-                    <a href="{{ ticket.value.button_url|default:'#' }}" class="theme-button w-full">
-                        {{ ticket.value.button_text }}
-                    </a>
+            {% for ticket in ticket_types %}
+            <div class="theme-card text-center">
+                <h3 class="theme-heading text-2xl mb-4">{{ ticket.name }}</h3>
+                <div class="text-4xl font-bold text-theme-primary mb-4">
+                    {% if ticket.current_price == 0 %}Free{% else %}&#8358;{{ ticket.current_price|floatformat:0 }}{% endif %}
+                    {% if ticket.is_early_bird %}
+                    <span class="text-sm font-normal text-green-600 ml-1">(Early Bird)</span>
                     {% endif %}
                 </div>
+                <p class="text-gray-600 mb-6">{{ ticket.description }}</p>
+                {% if ticket.is_sold_out %}
+                <span class="theme-button w-full cursor-not-allowed opacity-75 inline-block" style="pointer-events:none">Sold Out</span>
+                {% else %}
+                <a href="{% url 'tickets:purchase' %}" class="theme-button w-full">Buy Tickets</a>
                 {% endif %}
+            </div>
             {% endfor %}
         </div>
     </div>
@@ -326,36 +327,35 @@
 
 {% if page.sponsors %}
 <section class="theme-section">
-    <div class="theme-container">
+    <div class="theme-container text-center">
         {% if page.sponsor_section_title %}
         <h2 class="theme-heading text-4xl text-center mb-12">{{ page.sponsor_section_title }}</h2>
         {% endif %}
         
-        {% regroup page.sponsors by value.tier as sponsors_by_tier %}
-        {% for tier_group in sponsors_by_tier %}
+        {% if sponsors_by_tier %}
+        {% for tier_name, sponsors in sponsors_by_tier %}
         <div class="mb-12">
-            <h3 class="text-2xl font-semibold text-theme-primary mb-6 text-center capitalize">{{ tier_group.grouper }}</h3>
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 items-center">
-                {% for sponsor in tier_group.list %}
-                    {% if sponsor.block_type == 'sponsor' %}
-                    <div class="flex items-center justify-center p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                        {% if sponsor.value.website_url %}
-                        <a href="{{ sponsor.value.website_url }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center">
-                        {% endif %}
-                            {% if sponsor.value.logo %}
-                            {% image sponsor.value.logo max-200x100 class="max-h-16 max-w-full object-contain" alt=sponsor.value.name %}
-                            {% else %}
-                            <span class="text-gray-600">{{ sponsor.value.name }}</span>
-                            {% endif %}
-                        {% if sponsor.value.website_url %}
-                        </a>
-                        {% endif %}
-                    </div>
+            <h3 class="text-2xl font-semibold text-theme-primary mb-6 text-center">{{ tier_name }}</h3>
+            <div class="flex flex-wrap justify-center items-center gap-6 max-w-4xl mx-auto">
+                {% for sponsor in sponsors %}
+                <div class="flex items-center justify-center p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow w-full">
+                    {% if sponsor.value.website_url %}
+                    <a href="{{ sponsor.value.website_url }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-full">
                     {% endif %}
+                        {% if sponsor.value.logo %}
+                        {% image sponsor.value.logo max-200x100 class="max-h-16 max-w-full object-contain" alt=sponsor.value.name %}
+                        {% else %}
+                        <span class="text-gray-600">{{ sponsor.value.name }}</span>
+                        {% endif %}
+                    {% if sponsor.value.website_url %}
+                    </a>
+                    {% endif %}
+                </div>
                 {% endfor %}
             </div>
         </div>
         {% endfor %}
+        {% endif %}
     </div>
 </section>
 {% endif %}

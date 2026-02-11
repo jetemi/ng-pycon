@@ -33,19 +33,6 @@ class NavigationMenuItemBlock(blocks.StructBlock):
         label = "Menu Item"
 
 
-class TicketBlock(blocks.StructBlock):
-    """A ticket pricing tier."""
-    tier_name = blocks.CharBlock(max_length=100, required=True, help_text="e.g., Student, Personal, Business")
-    price = blocks.CharBlock(max_length=50, required=True, help_text="e.g., €60, $200, Free")
-    description = blocks.TextBlock(required=True)
-    button_text = blocks.CharBlock(max_length=50, default="Buy Tickets")
-    button_url = blocks.URLBlock(required=False)
-    
-    class Meta:
-        icon = "ticket"
-        label = "Ticket Tier"
-
-
 class SponsorBlock(blocks.StructBlock):
     """A sponsor entry."""
     name = blocks.CharBlock(max_length=200, required=True)
@@ -179,17 +166,6 @@ class HomePage(Page):
         help_text="Login button URL"
     )
     
-    # Ticket Pricing Section
-    ticket_section_title = models.CharField(
-        max_length=200,
-        default="Tickets",
-        blank=True,
-        help_text="Ticket pricing section title"
-    )
-    ticket_pricing = StreamField([
-        ('ticket', TicketBlock()),
-    ], blank=True, help_text="Add ticket pricing tiers")
-    
     # Sponsor Section
     sponsor_section_title = models.CharField(
         max_length=200,
@@ -304,13 +280,69 @@ class HomePage(Page):
                 self.title = f"PyCon Nigeria {self.conference_year}"
         return super().save(*args, **kwargs)
     
+    def get_sponsors_by_tier(self):
+        """
+        Return sponsors grouped by tier. Unlike Django's regroup (which only groups
+        consecutive items), this properly groups all sponsors of the same tier together.
+        """
+        if not self.sponsors:
+            return []
+        
+        tier_order = ['gold', 'silver', 'bronze', 'patron', 'startup', 'media']
+        tier_names = {
+            'gold': 'Gold', 'silver': 'Silver', 'bronze': 'Bronze',
+            'patron': 'Patron', 'startup': 'Startup', 'media': 'Media Partner'
+        }
+        
+        by_tier = {}
+        for block in self.sponsors:
+            if block.block_type == 'sponsor':
+                tier = block.value.get('tier', '').lower()
+                by_tier.setdefault(tier, []).append(block)
+        
+        result = []
+        for tier in tier_order:
+            if tier in by_tier:
+                result.append((tier_names.get(tier, tier.title()), by_tier[tier]))
+        for tier, sponsors in by_tier.items():
+            if tier not in tier_order:
+                result.append((tier_names.get(tier, tier.title()), sponsors))
+        return result
+
+    def get_ticket_types(self):
+        """Fetch ticket types from the tickets app for this page's conference year."""
+        from pyconng.context_processors import CURRENT_YEAR
+        from tickets.models import TicketType
+
+        year = self.conference_year or CURRENT_YEAR
+        ticket_types = (
+            TicketType.objects.active()
+            .for_year(year)
+            .order_by("display_order", "price")
+        )
+        return [
+            {
+                "name": tt.name,
+                "description": tt.description,
+                "current_price": tt.current_price,
+                "price": tt.price,
+                "early_bird_price": tt.early_bird_price,
+                "is_early_bird": tt.early_bird_remaining,
+                "remaining": tt.remaining_count,
+                "is_sold_out": tt.is_sold_out,
+            }
+            for tt in ticket_types
+        ]
+
     def get_context(self, request, *args, **kwargs):
         """
-        Add theme information to context for this HomePage.
+        Add theme information, sponsors_by_tier, and ticket_types to context for this HomePage.
         """
         context = super().get_context(request, *args, **kwargs)
         context['page_theme'] = self.theme
         context['page_conference_year'] = self.conference_year
+        context['sponsors_by_tier'] = self.get_sponsors_by_tier()
+        context['ticket_types'] = self.get_ticket_types()
         return context
 
     content_panels = Page.content_panels + [
@@ -337,11 +369,6 @@ class HomePage(Page):
         ], heading="Conference Info"),
         
         FieldPanel('features'),
-        
-        MultiFieldPanel([
-            FieldPanel('ticket_section_title'),
-            FieldPanel('ticket_pricing'),
-        ], heading="Ticket Pricing"),
         
         MultiFieldPanel([
             FieldPanel('sponsor_section_title'),

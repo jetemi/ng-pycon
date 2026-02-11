@@ -74,12 +74,6 @@
                                 </a>
                                 {% endif %}
                             {% endfor %}
-                        {% else %}
-                            <a href="{% if is_current_year %}/{% else %}/{{ conference_year }}/{% endif %}" class="theme-nav-link">Home</a>
-                            <a href="{% if is_current_year %}/tickets/{% else %}/{{ conference_year }}/tickets/{% endif %}" class="theme-nav-link">Tickets</a>
-                            <a href="{% if is_current_year %}/schedule/{% else %}/{{ conference_year }}/schedule/{% endif %}" class="theme-nav-link">Schedule</a>
-                            <a href="{% if is_current_year %}/speakers/{% else %}/{{ conference_year }}/speakers/{% endif %}" class="theme-nav-link">Speakers</a>
-                            <a href="{% if is_current_year %}/sponsors/{% else %}/{{ conference_year }}/sponsors/{% endif %}" class="theme-nav-link">Sponsors</a>
                         {% endif %}
                     </div>
                     
@@ -121,12 +115,6 @@
                                 </a>
                                 {% endif %}
                             {% endfor %}
-                        {% else %}
-                            <a href="{% if is_current_year %}/{% else %}/{{ conference_year }}/{% endif %}" class="theme-nav-link block">Home</a>
-                            <a href="{% if is_current_year %}/tickets/{% else %}/{{ conference_year }}/tickets/{% endif %}" class="theme-nav-link block">Tickets</a>
-                            <a href="{% if is_current_year %}/schedule/{% else %}/{{ conference_year }}/schedule/{% endif %}" class="theme-nav-link block">Schedule</a>
-                            <a href="{% if is_current_year %}/speakers/{% else %}/{{ conference_year }}/speakers/{% endif %}" class="theme-nav-link block">Speakers</a>
-                            <a href="{% if is_current_year %}/sponsors/{% else %}/{{ conference_year }}/sponsors/{% endif %}" class="theme-nav-link block">Sponsors</a>
                         {% endif %}
                         {% comment %}Only show auth for current year{% endcomment %}
                         {% if is_current_year %}
@@ -166,7 +154,7 @@
         
         {% comment %}Load theme-specific JS based on conference year{% endcomment %}
         {% if conference_theme %}
-        <script src="{% static 'js/themes/' %}{{ conference_theme }}.js" defer></script>
+        <script src="{% static 'js/themes/theme_' %}{{ conference_theme }}.js" defer></script>
         {% endif %}
 
         {% block extra_js %}{% endblock %}

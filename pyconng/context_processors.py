@@ -2,6 +2,7 @@
 Context processors for PyCon Nigeria website
 """
 from django.conf import settings
+from django.db.models import Q
 from django.template.loader import get_template
 from wagtail.models import Site
 import re
@@ -94,7 +95,8 @@ def site_context(request):
 def navigation_context(request):
     """
     Add navigation menu items to template context based on the current year.
-    Gets navigation from HomePage for current year, or YearArchivePage for archived years.
+    Gets navigation from HomePage - current year has conference_year=None/blank,
+    archived years have conference_year set to the year.
     """
     # Extract year from URL path (same logic as conference_context)
     year = None
@@ -118,42 +120,87 @@ def navigation_context(request):
     try:
         site = Site.find_for_request(request)
         if site:
+            from home.models import HomePage
+            
             if year == CURRENT_YEAR:
-                # For current year, get navigation from HomePage
-                from home.models import HomePage
+                # For current year, check if root_page itself is a HomePage (most common case)
+                # The site's root_page is typically the current year's homepage
+                root_page = site.root_page.specific
+                if isinstance(root_page, HomePage):
+                    # Check if this root homepage is for the current year
+                    if (root_page.conference_year is None or 
+                        root_page.conference_year == CURRENT_YEAR):
+                        home_page = root_page
+                    else:
+                        home_page = None
+                else:
+                    home_page = None
+                
+                # If root_page is not the current year homepage, look for children
+                if not home_page:
+                    home_page = (
+                        site.root_page.get_children()
+                        .type(HomePage)
+                        .live()
+                        .filter(
+                            # Current year homepage: conference_year is NULL/blank OR equals CURRENT_YEAR
+                            Q(conference_year__isnull=True) | 
+                            Q(conference_year=CURRENT_YEAR)
+                        )
+                        .first()
+                    )
+                
+                # If still not found, try any HomePage with matching conference_year
+                if not home_page:
+                    home_page = (
+                        HomePage.objects
+                        .live()
+                        .filter(
+                            Q(conference_year__isnull=True) | 
+                            Q(conference_year=CURRENT_YEAR)
+                        )
+                        .first()
+                    )
+                
+                # Final fallback: if root_page is a HomePage, use it regardless of conference_year
+                # This handles cases where the site root might be set to a different year
+                if not home_page and isinstance(root_page, HomePage):
+                    home_page = root_page
+                
+                if home_page:
+                    # Ensure we have the specific instance (root_page.specific is already specific, but children need it)
+                    if not isinstance(home_page, HomePage):
+                        home_page = home_page.specific
+                    navigation_items = home_page.navigation_menu_items
+                    page_year = home_page.conference_year or CURRENT_YEAR
+            else:
+                # For archived years, get HomePage where conference_year matches the year
                 home_page = (
-                    site.root_page.get_children()
-                    .type(HomePage)
+                    HomePage.objects
                     .live()
+                    .filter(conference_year=year)
                     .first()
                 )
+                
+                # Also try by slug as fallback
+                if not home_page:
+                    home_page = (
+                        HomePage.objects
+                        .live()
+                        .filter(slug=str(year))
+                        .first()
+                    )
+                
                 if home_page:
                     home_page = home_page.specific
                     navigation_items = home_page.navigation_menu_items
-                    page_year = CURRENT_YEAR
-            else:
-                # For archived years, get navigation from YearArchivePage
-                from home.models import HomePage, YearArchivePage
-                home_page = (
-                    site.root_page.get_children()
-                    .type(HomePage)
-                    .live()
-                    .first()
-                )
-                if home_page:
-                    year_archive = (
-                        home_page.get_children()
-                        .type(YearArchivePage)
-                        .filter(slug=str(year))
-                        .live()
-                        .first()
-                    )
-                    if year_archive:
-                        year_archive = year_archive.specific
-                        navigation_items = year_archive.navigation_menu_items
-                        page_year = year
-    except Exception:
+                    page_year = home_page.conference_year or year
+    except Exception as e:
         # If there's any error, navigation_items will remain None
+        # In production, you might want to log this
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error getting navigation for year {year}: {e}")
         pass
     
     return {

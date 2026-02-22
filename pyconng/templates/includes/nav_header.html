@@ -1,0 +1,174 @@
+{% load static %}
+{% comment %}
+Shared navigation header with dropdown support.
+Uses inline x-data to avoid scope/store issues (e.g. when logged in with Wagtail userbar).
+{% endcomment %}
+<header class="theme-nav" x-data="{
+  isOpen: false,
+  openDropdownIndex: null,
+  mobileExpanded: [],
+  toggle() { this.isOpen = !this.isOpen },
+  close() { this.isOpen = false },
+  openDropdown(i) { this.openDropdownIndex = i },
+  closeDropdown() { this.openDropdownIndex = null },
+  toggleDropdown(i) { this.openDropdownIndex = this.openDropdownIndex === i ? null : i },
+  toggleMobileItem(i) {
+    const idx = this.mobileExpanded.indexOf(i);
+    if (idx >= 0) this.mobileExpanded = this.mobileExpanded.filter(x => x !== i);
+    else this.mobileExpanded = [...this.mobileExpanded, i];
+  }
+}">
+    <div class="theme-container">
+        <nav class="flex items-center justify-between py-4">
+            <div class="flex items-center">
+                <a href="{% if is_current_year %}/{% else %}/{{ conference_year }}/{% endif %}" class="text-2xl font-bold text-theme-primary">
+                    {{ site_name }}
+                </a>
+            </div>
+            
+            {% comment %}Desktop navigation{% endcomment %}
+            <div class="hidden md:flex items-center space-x-1">
+                {% if navigation_menu_items %}
+                    {% for item in navigation_menu_items %}
+                        {% if item.block_type == 'menu_item' %}
+                            {% with sub_items=item.value.sub_items %}
+                            {% if sub_items %}
+                                {% comment %}Dropdown parent{% endcomment %}
+                                <div class="relative nav-dropdown-trigger">
+                                    <button type="button"
+                                        class="theme-nav-link inline-flex items-center gap-1 cursor-pointer border-0 bg-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--theme-primary)] rounded-lg"
+                                        :class="{ 'nav-dropdown-active': openDropdownIndex === {{ forloop.counter0 }} }"
+                                        @click.prevent="toggleDropdown({{ forloop.counter0 }})"
+                                        :aria-expanded="openDropdownIndex === {{ forloop.counter0 }}"
+                                        aria-haspopup="true">
+                                        <span>{{ item.value.label }}</span>
+                                        <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': openDropdownIndex === {{ forloop.counter0 }} }" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
+                                    <div x-show="openDropdownIndex === {{ forloop.counter0 }}"
+                                        x-transition:enter="transition ease-out duration-200"
+                                        x-transition:enter-start="opacity-0 -translate-y-1"
+                                        x-transition:enter-end="opacity-100 translate-y-0"
+                                        x-transition:leave="transition ease-in duration-150"
+                                        x-transition:leave-start="opacity-100 translate-y-0"
+                                        x-transition:leave-end="opacity-0 -translate-y-1"
+                                        @click.away="closeDropdown()"
+                                        class="nav-dropdown-panel absolute left-0 right-auto min-w-[280px] z-[200] pt-2"
+                                        x-cloak
+                                        style="display: none;">
+                                        <div class="nav-dropdown-inner">
+                                            {% for sub in sub_items %}
+                                            <a href="{{ sub.link_url }}" class="nav-dropdown-item">
+                                                {{ sub.label }}
+                                            </a>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                {% comment %}Simple link{% endcomment %}
+                                <a href="{{ item.value.link_url|default:'#' }}" class="theme-nav-link">
+                                    {{ item.value.label }}
+                                </a>
+                            {% endif %}
+                            {% endwith %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                {% comment %}Only show auth for current year{% endcomment %}
+                {% if is_current_year %}
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}" class="theme-nav-link">Sign Out</a>
+                    {% else %}
+                    <a href="{% url 'signup' %}" class="theme-nav-link">Sign Up</a>
+                    <a href="{% url 'login' %}" class="theme-button">
+                        Sign In
+                    </a>
+                    {% endif %}
+                {% else %}
+                    {% comment %}For archived years, show archive indicator{% endcomment %}
+                    {% if page_conference_year or conference_year != current_year %}
+                    <span class="text-sm px-3 py-1 bg-gray-200 text-gray-700 rounded-full">
+                        {{ conference_year }} Archive
+                    </span>
+                    {% endif %}
+                {% endif %}
+                
+                <button @click="toggle()" class="md:hidden text-theme-primary focus:outline-none" aria-label="Toggle menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+        
+        {% comment %}Mobile navigation{% endcomment %}
+        <div x-show="isOpen" @click.away="close()" x-transition class="md:hidden pb-4">
+            <div class="flex flex-col space-y-1">
+                {% if navigation_menu_items %}
+                    {% for item in navigation_menu_items %}
+                        {% if item.block_type == 'menu_item' %}
+                            {% with sub_items=item.value.sub_items %}
+                            {% if sub_items %}
+                                {% comment %}Mobile accordion parent{% endcomment %}
+                                <div class="mobile-nav-item">
+                                    <button type="button"
+                                        @click="toggleMobileItem({{ forloop.counter0 }})"
+                                        class="theme-nav-link block w-full text-left flex items-center justify-between py-3 border-0 bg-transparent cursor-pointer"
+                                        :aria-expanded="mobileExpanded.includes({{ forloop.counter0 }})">
+                                        <span>{{ item.value.label }}</span>
+                                        <svg class="w-5 h-5 transition-transform" :class="{ 'rotate-180': mobileExpanded.includes({{ forloop.counter0 }}) }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
+                                    <div x-show="mobileExpanded.includes({{ forloop.counter0 }})"
+                                        x-transition:enter="transition ease-out duration-200"
+                                        x-transition:enter-start="opacity-0 -translate-y-2"
+                                        x-transition:enter-end="opacity-100 translate-y-0"
+                                        x-transition:leave="transition ease-in duration-150"
+                                        x-transition:leave-start="opacity-100 translate-y-0"
+                                        x-transition:leave-end="opacity-0 -translate-y-2"
+                                        class="mobile-nav-subitems"
+                                        x-cloak
+                                        style="display: none;">
+                                        {% for sub in sub_items %}
+                                        <a href="{{ sub.link_url }}" class="mobile-nav-subitem block" @click="close()">
+                                            {{ sub.label }}
+                                        </a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <a href="{{ item.value.link_url|default:'#' }}" class="theme-nav-link block py-3" @click="close()">
+                                    {{ item.value.label }}
+                                </a>
+                            {% endif %}
+                            {% endwith %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% comment %}Only show auth for current year{% endcomment %}
+                {% if is_current_year %}
+                <div class="pt-4 border-t border-gray-200 mt-2">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}" class="theme-nav-link block">Sign Out</a>
+                    {% else %}
+                    <a href="{% url 'signup' %}" class="theme-nav-link block">Sign Up</a>
+                    <a href="{% url 'login' %}" class="theme-button block text-center mt-2">Sign In</a>
+                    {% endif %}
+                </div>
+                {% elif page_conference_year or conference_year != current_year %}
+                <div class="pt-4 border-t border-gray-200 mt-2">
+                    <span class="text-sm px-3 py-1 bg-gray-200 text-gray-700 rounded-full block text-center">
+                        {{ conference_year }} Archive
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</header>

@@ -91,6 +91,11 @@
   }
 }
 
+/* Alpine.js x-cloak - hide until hydrated */
+[x-cloak] {
+  display: none !important;
+}
+
 /* Animation classes */
 .animate-on-scroll {
   opacity: 0;

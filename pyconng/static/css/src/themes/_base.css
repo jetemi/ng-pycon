@@ -113,19 +113,25 @@
   color: var(--theme-primary-700);
 }
 
-/* Navigation */
+/* Navigation - PyCon US style: solid background for text visibility */
 .theme-nav {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  --nav-bg: var(--theme-primary-800, #075985);
+  --nav-text: #ffffff;
+  --nav-text-hover: rgba(255, 255, 255, 0.9);
+  background: var(--nav-bg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   position: sticky;
   top: 0;
   z-index: 100;
   transition: all 0.3s ease;
 }
 
+.theme-nav .text-theme-primary {
+  color: var(--nav-text) !important;
+}
+
 .theme-nav-link {
-  color: var(--theme-primary);
+  color: var(--nav-text);
   text-decoration: none;
   font-weight: 500;
   padding: 0.5rem 1rem;
@@ -134,8 +140,103 @@
 }
 
 .theme-nav-link:hover {
-  background-color: var(--theme-primary-50);
-  color: var(--theme-primary-700);
+  background-color: rgba(255, 255, 255, 0.15);
+  color: var(--nav-text-hover);
+}
+
+/* Navigation dropdown - Desktop (PyCon US style) */
+.nav-dropdown-trigger {
+  position: relative;
+}
+
+.nav-dropdown-active {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  color: var(--nav-text) !important;
+  border: 2px solid var(--theme-accent, #f97316) !important;
+  border-radius: 0.5rem;
+}
+
+.nav-dropdown-panel {
+  top: 100%;
+  margin-top: 0;
+}
+
+.nav-dropdown-inner {
+  display: block;
+  background: #ffffff !important;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2), 0 4px 16px rgba(0, 0, 0, 0.15);
+  padding: 0.75rem 0;
+  min-width: 240px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.nav-dropdown-item {
+  display: block !important;
+  padding: 0.75rem 1.25rem;
+  margin: 0;
+  color: #1f2937 !important;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  border-bottom: 1px solid #e5e7eb;
+  border-left: 3px solid transparent;
+}
+
+.nav-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.nav-dropdown-item:hover {
+  background-color: #f9fafb;
+  border-left-color: var(--theme-accent, #f97316);
+  text-decoration: underline;
+  text-decoration-color: var(--theme-accent, #f97316);
+  text-underline-offset: 4px;
+}
+
+/* Nav action buttons - Sign Up / Sign In on dark nav */
+.theme-nav .theme-button {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: var(--nav-text);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.theme-nav .theme-button:hover {
+  background-color: #ffffff;
+  color: var(--nav-bg);
+  border-color: #ffffff;
+}
+
+/* Archive badge on dark nav */
+.theme-nav span.bg-gray-200 {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  color: var(--nav-text) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Mobile accordion sub-items */
+.mobile-nav-subitems {
+  padding-left: 1rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.mobile-nav-subitem {
+  display: block;
+  padding: 0.625rem 1rem;
+  margin: 0.125rem 0;
+  background-color: var(--theme-primary);
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.mobile-nav-subitem:hover {
+  background-color: var(--theme-primary-700);
+  color: white;
 }
 
 /* Footer */

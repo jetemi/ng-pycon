@@ -23,11 +23,32 @@ class FeatureBlock(blocks.StructBlock):
         label = "Feature Card"
 
 
+class NavigationSubItemBlock(blocks.StructBlock):
+    """A sub-item within a navigation dropdown (e.g. 'Proposal Guidelines' under 'Speaking')."""
+    label = blocks.CharBlock(max_length=80, required=True)
+    link_url = blocks.CharBlock(max_length=200, required=True, help_text="URL or page path")
+
+    class Meta:
+        icon = "arrows-up-down"
+        label = "Sub-menu Item"
+
+
 class NavigationMenuItemBlock(blocks.StructBlock):
-    """A navigation menu item."""
+    """A navigation menu item - can be a simple link or a dropdown with sub-items."""
     label = blocks.CharBlock(max_length=50, required=True)
-    link_url = blocks.CharBlock(max_length=200, required=True, help_text="URL or page path (e.g., /tickets/ or https://example.com)")
-    
+    link_url = blocks.CharBlock(
+        max_length=200,
+        required=False,
+        blank=True,
+        help_text="URL for direct link. Leave blank if this item has sub-menu items."
+    )
+    sub_items = blocks.ListBlock(
+        NavigationSubItemBlock(),
+        required=False,
+        blank=True,
+        help_text="Add sub-menu items to show a dropdown. If empty, this will be a direct link."
+    )
+
     class Meta:
         icon = "link"
         label = "Menu Item"

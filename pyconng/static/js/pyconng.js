@@ -1,16 +1,7 @@
 // Alpine.js initialization
 import Alpine from 'alpinejs'
 
-// Alpine.js global data and functions
-Alpine.data('navigation', () => ({
-  isOpen: false,
-  toggle() {
-    this.isOpen = !this.isOpen
-  },
-  close() {
-    this.isOpen = false
-  }
-}))
+// Note: Navigation uses inline x-data in nav_header.html to avoid scope/store issues
 
 Alpine.data('theme', (initialTheme = null) => ({
   currentTheme: '2026', // Default theme

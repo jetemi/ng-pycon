@@ -24,12 +24,8 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-        <link rel="stylesheet" type="text/css" href="{% static 'css/pyconng.css' %}">
-        
-        {% comment %}Load theme-specific CSS based on conference year{% endcomment %}
-        {% if conference_theme %}
-        <link rel="stylesheet" href="{% static 'css/src/themes/' %}{{ conference_theme }}.css">
-        {% endif %}
+        {% comment %}Load theme-specific CSS only{% endcomment %}
+        <link rel="stylesheet" type="text/css" href="{% static 'css/' %}{{ conference_theme|default:'2026' }}.css">
 
         {% block extra_css %}{% endblock %}
 

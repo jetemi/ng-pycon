@@ -28,6 +28,12 @@ urlpatterns = [
     
     # CFP (must be before Wagtail catch-all)
     path("cfp/", include("cfp.urls")),
+
+    # Travel Grants (must be before Wagtail catch-all)
+    path("grants/", include("grants.urls")),
+
+    # Dashboard (login required, current year only)
+    path("dashboard/", include("dashboard.urls")),
     
     # Year-specific routing using custom view. Past years are read-only snapshots.
     path("<int:year>/search/", search_views.search, name="year_search"),

@@ -82,6 +82,7 @@ Uses inline x-data to avoid scope/store issues (e.g. when logged in with Wagtail
                 {% comment %}Only show auth for current year{% endcomment %}
                 {% if is_current_year %}
                     {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard:index' %}" class="theme-nav-link">Dashboard</a>
                     <a href="{% url 'logout' %}" class="theme-nav-link">Sign Out</a>
                     {% else %}
                     <a href="{% url 'signup' %}" class="theme-nav-link">Sign Up</a>
@@ -155,6 +156,7 @@ Uses inline x-data to avoid scope/store issues (e.g. when logged in with Wagtail
                 {% if is_current_year %}
                 <div class="pt-4 border-t border-gray-200 mt-2">
                     {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard:index' %}" class="theme-nav-link block">Dashboard</a>
                     <a href="{% url 'logout' %}" class="theme-nav-link block">Sign Out</a>
                     {% else %}
                     <a href="{% url 'signup' %}" class="theme-nav-link block">Sign Up</a>

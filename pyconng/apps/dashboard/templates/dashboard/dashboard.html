@@ -1,0 +1,213 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Dashboard - PyCon Nigeria {{ conference_year }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <section class="py-12 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">My Dashboard</h1>
+                <p class="text-gray-600">PyCon Nigeria {{ conference_year }} — Your conference hub</p>
+            </div>
+
+            {% if messages %}
+            <div class="mb-6">
+                {% for message in messages %}
+                <div class="px-4 py-3 rounded-lg text-sm font-medium
+                    {% if message.tags == 'success' %}bg-green-100 text-green-800
+                    {% elif message.tags == 'error' %}bg-red-100 text-red-800
+                    {% else %}bg-blue-100 text-blue-800{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {# ========== ATTENDEE SECTION (all logged-in users) ========== #}
+            <div class="mb-10">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Attendee</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {# Tickets #}
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <div class="text-2xl mb-3">🎫</div>
+                        <h3 class="font-semibold text-gray-900 mb-2">Tickets</h3>
+                        <p class="text-sm text-gray-500 mb-4">Get your ticket to attend PyCon Nigeria</p>
+                        <a href="{% url 'tickets:home' %}"
+                           class="inline-flex items-center px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg transition-colors">
+                            View Tickets
+                        </a>
+                    </div>
+                    {# Travel Grant #}
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <div class="text-2xl mb-3">✈️</div>
+                        <h3 class="font-semibold text-gray-900 mb-2">Travel Grant</h3>
+                        {% if grant_application %}
+                            <p class="text-sm text-gray-500 mb-2">Status: <span class="font-medium text-gray-700">{{ grant_application.get_status_display }}</span></p>
+                            <p class="text-sm text-gray-500 mb-4">Requested: ₦{{ grant_application.total_requested|floatformat:0 }}</p>
+                            <div class="flex flex-wrap gap-2">
+                                <a href="{% url 'grants:my_application' %}"
+                                   class="inline-flex items-center px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg transition-colors">
+                                    View Application
+                                </a>
+                                {% if grant_application.can_withdraw %}
+                                <form method="post" action="{% url 'grants:withdraw' grant_application.pk %}"
+                                      onsubmit="return confirm('Withdraw your application?');" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50">
+                                        Withdraw
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        {% elif grant_open %}
+                            <p class="text-sm text-gray-500 mb-4">Apply for financial assistance to attend</p>
+                            <a href="{% url 'grants:apply' %}"
+                               class="inline-flex items-center px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg transition-colors">
+                                Apply for Travel Grant
+                            </a>
+                        {% else %}
+                            <p class="text-sm text-gray-500 mb-4">Applications are currently closed</p>
+                            <a href="{% url 'grants:landing' %}"
+                               class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                                Learn More
+                            </a>
+                        {% endif %}
+                    </div>
+                    {# CFP #}
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <div class="text-2xl mb-3">📝</div>
+                        <h3 class="font-semibold text-gray-900 mb-2">Call for Proposals</h3>
+                        {% if cfp_info and cfp_info.submitted %}
+                            <p class="text-sm text-gray-500 mb-2">Status: <span class="font-medium text-gray-700">{{ cfp_info.status_display }}</span></p>
+                            <p class="text-sm text-gray-500 mb-4">You have submitted a proposal</p>
+                            <a href="{% url 'cfp:access' %}"
+                               class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                                Request Access Link
+                            </a>
+                        {% elif cfp_open %}
+                            <p class="text-sm text-gray-500 mb-4">Submit a talk, workshop or tutorial</p>
+                            <a href="{% url 'cfp:submit' %}"
+                               class="inline-flex items-center px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg transition-colors">
+                                Submit CFP
+                            </a>
+                        {% else %}
+                            <p class="text-sm text-gray-500 mb-4">CFP is currently closed</p>
+                            <a href="{% url 'cfp:landing' %}"
+                               class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                                Learn More
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# ========== CFP REVIEWER SECTION ========== #}
+            {% if roles.is_cfp_reviewer %}
+            <div class="mb-10">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">CFP Reviewer</h2>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <p class="text-gray-600 mb-1">You have <strong>{{ cfp_context.assignment_count }}</strong> assigned submission(s)</p>
+                            <p class="text-sm text-gray-500">Score submissions, leave comments, mark conflicts</p>
+                        </div>
+                        <a href="{% url 'cfp:review_list' %}"
+                           class="inline-flex items-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors">
+                            View Assignments
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {# ========== PROGRAM CHAIR (CFP Chair) SECTION ========== #}
+            {% if roles.is_cfp_chair %}
+            <div class="mb-10">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Program Chair</h2>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <p class="text-gray-600 mb-4">View all submissions, override scores, manage decisions, send emails</p>
+                    <a href="{% url 'cfp:admin_dashboard' %}"
+                       class="inline-flex items-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors">
+                        CFP Admin Dashboard
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            {# ========== TRAVEL GRANT REVIEWER SECTION ========== #}
+            {% if roles.is_grant_reviewer %}
+            <div class="mb-10">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Travel Grant Reviewer</h2>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <p class="text-gray-600 mb-1">You have <strong>{{ grant_assignment_count }}</strong> assigned application(s)</p>
+                            <p class="text-sm text-gray-500">Score applications, leave internal notes</p>
+                        </div>
+                        <a href="{% url 'grants:review_list' %}"
+                           class="inline-flex items-center px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg transition-colors">
+                            View Assignments
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {# ========== TRAVEL GRANT CHAIR SECTION ========== #}
+            {% if roles.is_grant_chair %}
+            <div class="mb-10">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Travel Grant Chair</h2>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <p class="text-gray-600 mb-4">View all applications, make decisions, assign reviewers, export reports</p>
+                    <a href="{% url 'grants:admin_dashboard' %}"
+                       class="inline-flex items-center px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg transition-colors">
+                        Grant Admin Dashboard
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            {# ========== FINANCE TEAM SECTION ========== #}
+            {% if roles.is_finance %}
+            <div class="mb-10">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Finance Team</h2>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <p class="text-gray-600 mb-4">View approved grants, mark as paid, export payment reports</p>
+                    <a href="{% url 'grants:finance_list' %}"
+                       class="inline-flex items-center px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg transition-colors">
+                        Finance Dashboard
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            {# ========== SUPER ADMIN SECTION ========== #}
+            {% if roles.is_super_admin %}
+            <div class="mb-10">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Super Admin</h2>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <p class="text-gray-600 mb-4">Manage CFP, travel grants, deadlines, scoring, and full exports</p>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="/admin/" target="_blank" rel="noopener"
+                           class="inline-flex items-center px-5 py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-medium rounded-lg transition-colors">
+                            Wagtail Admin
+                        </a>
+                        <a href="{% url 'grants:admin_dashboard' %}"
+                           class="inline-flex items-center px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                            Grant Admin
+                        </a>
+                        <a href="{% url 'cfp:admin_dashboard' %}"
+                           class="inline-flex items-center px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                            CFP Admin
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </section>
+</div>
+{% endblock %}

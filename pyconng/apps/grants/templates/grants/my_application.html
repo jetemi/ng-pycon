@@ -1,0 +1,128 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}My Travel Grant - PyCon Nigeria {{ conference_year }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+
+    <section class="py-12 px-4">
+        <div class="max-w-3xl mx-auto">
+
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">My Travel Grant Application</h1>
+                <p class="text-gray-600">PyCon Nigeria {{ conference_year }}</p>
+            </div>
+
+            {% if messages %}
+            <div class="mb-6">
+                {% for message in messages %}
+                <div class="px-4 py-3 rounded-lg text-sm font-medium
+                    {% if message.tags == 'success' %}bg-green-100 text-green-800
+                    {% elif message.tags == 'error' %}bg-red-100 text-red-800
+                    {% else %}bg-blue-100 text-blue-800{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if not application %}
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
+                    <p class="text-gray-600 mb-6">You haven't applied for a travel grant yet.</p>
+                    {% if grant_open %}
+                    <a href="{% url 'grants:apply' %}"
+                       class="inline-block px-8 py-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg transition-colors duration-200">
+                        Apply for Travel Grant
+                    </a>
+                    {% else %}
+                    <p class="text-sm text-gray-500">Applications are currently closed.</p>
+                    <a href="{% url 'grants:landing' %}"
+                       class="inline-block mt-4 px-6 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50">
+                        Back to Travel Grant
+                    </a>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 mb-6">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                        <div>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                {% if application.status == 'submitted' or application.status == 'under_review' %}bg-blue-100 text-blue-800
+                                {% elif application.status == 'approved' %}bg-green-100 text-green-800
+                                {% elif application.status == 'waitlisted' %}bg-yellow-100 text-yellow-800
+                                {% elif application.status == 'not_selected' %}bg-red-100 text-red-800
+                                {% elif application.status == 'withdrawn' %}bg-gray-100 text-gray-800
+                                {% elif application.status == 'paid' %}bg-green-100 text-green-800
+                                {% else %}bg-gray-100 text-gray-700{% endif %}">
+                                {{ application.get_status_display }}
+                            </span>
+                        </div>
+                        <div class="flex gap-2">
+                            {% if application.status != 'draft' %}
+                            <a href="{% url 'grants:application_detail' application.pk %}"
+                               class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg">
+                                View Application
+                            </a>
+                            {% endif %}
+                            {% if application.is_editable and grant_open %}
+                            <a href="{% url 'grants:apply' %}"
+                               class="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50">
+                                Edit Application
+                            </a>
+                            {% endif %}
+                            {% if application.can_withdraw %}
+                            <form method="post" action="{% url 'grants:withdraw' application.pk %}"
+                                  onsubmit="return confirm('Are you sure you want to withdraw your application?');">
+                                {% csrf_token %}
+                                <button type="submit" class="px-4 py-2 border border-red-300 text-red-700 font-medium rounded-lg hover:bg-red-50">
+                                    Withdraw
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {% if application.submitted_at %}
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Submission date</dt>
+                            <dd class="text-gray-900">{{ application.submitted_at|date:"F j, Y g:i A" }}</dd>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Funding requested</dt>
+                            <dd class="text-gray-900 font-semibold">₦{{ application.total_requested|floatformat:2 }}</dd>
+                        </div>
+                        {% if application.approved_amount %}
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Approved amount</dt>
+                            <dd class="text-gray-900 font-semibold">₦{{ application.approved_amount|floatformat:2 }}</dd>
+                        </div>
+                        {% endif %}
+                    </dl>
+
+                    {% if application.status == 'approved' %}
+                    <div class="mt-6 p-4 bg-teal-50 border border-teal-200 rounded-lg">
+                        <h3 class="font-semibold text-teal-900 mb-2">Next steps</h3>
+                        <p class="text-sm text-teal-800">
+                            You will receive further instructions via email. If you need to upload reimbursement details,
+                            please follow the link provided in the approval email.
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="flex gap-3">
+                    <a href="{% url 'grants:landing' %}"
+                       class="px-6 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50">
+                        Back to Travel Grant
+                    </a>
+                </div>
+            {% endif %}
+
+        </div>
+    </section>
+
+</div>
+{% endblock %}

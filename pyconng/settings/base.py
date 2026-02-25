@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     "search",
     "tickets",
     "cfp",
+    "grants",
+    "dashboard",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
     "wagtail.embeds",

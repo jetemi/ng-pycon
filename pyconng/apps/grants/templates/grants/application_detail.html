@@ -1,0 +1,78 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}View Application - PyCon Nigeria {{ conference_year }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+
+    <section class="py-12 px-4">
+        <div class="max-w-3xl mx-auto">
+
+            <div class="mb-6 flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Travel Grant Application</h1>
+                    <p class="text-gray-600">Submitted {{ application.submitted_at|date:"F j, Y"|default:"—" }}</p>
+                </div>
+                <a href="{% url 'grants:my_application' %}"
+                   class="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50">
+                    Back to Dashboard
+                </a>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 space-y-8">
+
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-3">Basic Information</h2>
+                    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                        <div><dt class="text-gray-500">Country</dt><dd>{{ application.country_of_residence }}</dd></div>
+                        <div><dt class="text-gray-500">City</dt><dd>{{ application.city }}</dd></div>
+                        <div><dt class="text-gray-500">Passport required</dt><dd>{{ application.passport_required|yesno:"Yes,No" }}</dd></div>
+                    </dl>
+                </div>
+
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-3">Conference Participation</h2>
+                    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                        <div><dt class="text-gray-500">First time PyCon</dt><dd>{{ application.first_time_pycon|yesno:"Yes,No" }}</dd></div>
+                    </dl>
+                    {% if application.community_involvement %}
+                    <p class="mt-2 text-sm text-gray-700">{{ application.community_involvement }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-3">Financial Need</h2>
+                    <p class="text-sm text-gray-700 whitespace-pre-wrap">{{ application.financial_need_reason }}</p>
+                    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm mt-3">
+                        <div><dt class="text-gray-500">Employment</dt><dd>{{ application.get_employment_status_display }}</dd></div>
+                        <div><dt class="text-gray-500">Student</dt><dd>{{ application.is_student|yesno:"Yes,No" }}</dd></div>
+                    </dl>
+                </div>
+
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-3">Budget</h2>
+                    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                        <div><dt class="text-gray-500">Transport</dt><dd>₦{{ application.estimated_transport_cost|floatformat:2 }}</dd></div>
+                        <div><dt class="text-gray-500">Accommodation</dt><dd>₦{{ application.estimated_accommodation_cost|floatformat:2 }}</dd></div>
+                        <div><dt class="text-gray-500">Total requested</dt><dd class="font-semibold">₦{{ application.total_requested|floatformat:2 }}</dd></div>
+                        <div><dt class="text-gray-500">Other funding</dt><dd>{{ application.other_funding_sources|yesno:"Yes,No" }}</dd></div>
+                    </dl>
+                    {% if application.other_funding_details %}
+                    <p class="mt-2 text-sm text-gray-600">{{ application.other_funding_details }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-3">Impact Statement</h2>
+                    <p class="text-sm text-gray-700 whitespace-pre-wrap">{{ application.community_impact }}</p>
+                    <p class="mt-2 text-sm text-gray-600">Commit to share learnings: {{ application.commit_to_share_learnings|yesno:"Yes,No" }}</p>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+</div>
+{% endblock %}

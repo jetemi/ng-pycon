@@ -1,255 +1,184 @@
-# PyCon Nigeria Website
+# PyCon Nigeria
 
-A PyCon Nigeria conference management platform built with Wagtail CMS and Django, featuring a yearly theming system for visual customization while maintaining consistent backend functionality.
-
-## Features
-
-- **Conference Management**: Speaker submissions, ticketing, sponsorships, financial aid
-- **Yearly Theming**: Complete visual customization per conference year using CSS custom properties
-- **Wagtail CMS**: Flexible content management system
-- **Modern Frontend**: Tailwind CSS + Alpine.js for responsive and interactive UI
-- **Docker Support**: Containerized development environment
-- **Content Management**: All content managed through Wagtail admin (no hardcoded content)
+The official website and conference management platform for **PyCon Nigeria** — the premier Python conference in Nigeria.
 
 ## Tech Stack
 
-### Backend
-- **Django 5.2.3**: Web framework
-- **Wagtail 7.0.1**: CMS framework
-- **PostgreSQL**: Database
-- **Python 3.12**: Programming language
+- **Backend:** Django 5.2, Wagtail CMS
+- **Frontend:** Tailwind CSS, Alpine.js
+- **Database:** PostgreSQL (production) or SQLite (local dev)
+- **Payments:** Paystack
 
-### Frontend
-- **Tailwind CSS**: Utility-first CSS framework
-- **Alpine.js**: Lightweight JavaScript framework
-- **PostCSS**: CSS processing
-- **Custom theming system**: Year-based visual customization
+## Features
 
-## Setup Instructions
+- **Multi-year support** — Content for 2024, 2025, 2026 with year-specific themes
+- **Tickets** — Ticket types, purchase flow, Paystack integration
+- **Call for Proposals (CFP)** — Submit talks/workshops, reviewer workflow, program chair tools
+- **Travel Grants** — Apply for grants, reviewer scoring, finance tracking
+- **User Dashboard** — Role-based hub for attendees, reviewers, chairs, and admins
 
-### Prerequisites
+## Prerequisites
 
-- Docker and Docker Compose
-- Node.js 18+ and npm
-- Python 3.12+ (for local development)
+- **Python 3.10+**
+- **Node.js 18+** (for Tailwind CSS)
+- **PostgreSQL** (optional for local dev; SQLite works out of the box)
 
-### Quick Start
+---
 
-1. **Clone and setup**:
-   ```bash
-   git clone https://github.com/jetemi/ng-pycon.git
-   cd ng-pycon
-   ./scripts/setup-dev.sh
-   ```
+## Quick Start (Local Development)
 
-### Manual Setup
+### 1. Clone the repository
 
-1. **Copy environment file**:
-   ```bash
-   cp .env.example .env
-   ```
-
-2. **Update environment variables** in `.env`:
-   - Change `SECRET_KEY` to a secure random string
-   - Update database credentials if needed
-   - Set `DEBUG=False` for production
-
-3. **Install Node.js dependencies**:
-   ```bash
-   npm install
-   ```
-
-4. **Build frontend assets**:
-   ```bash
-   npm run build-css-prod
-   ```
-
-5. **Start services**:
-   ```bash
-   docker-compose up --build
-   ```
-
-6. **Run migrations** (in a new terminal):
-   ```bash
-   docker-compose exec web python manage.py migrate
-   ```
-
-7. **Create superuser**:
-   ```bash
-   docker-compose exec web python manage.py createsuperuser
-   ```
-
-8. **Access the application**:
-   - Website: http://localhost:8000
-   - Wagtail Admin: http://localhost:8000/admin
-
-## Content Management
-
-### Wagtail CMS Approach
-This project follows Wagtail CMS best practices:
-- **No hardcoded content** - All content is managed through the admin interface
-- **StreamField blocks** - Flexible, reusable content components
-- **Rich text fields** - WYSIWYG editing for formatted content
-- **Admin panels** - Organized content editing interface
-
-### Managing Content
-
-1. **Access Admin**: Go to `http://localhost:8000/admin` and log in
-2. **Edit Home Page**: Navigate to Pages → Home to edit:
-   - **Hero Section**: Title, subtitle, description, call-to-action buttons
-   - **Conference Info**: Section title and description
-   - **Feature Cards**: Add/remove/reorder feature cards with icons, titles, descriptions, and links
-   - **Year Navigation**: Customize section title and description
-
-3. **Adding Feature Cards**:
-   - Click "Add feature" in the Features section
-   - Add title and description (required)
-   - Optionally add SVG icon code and link
-   - Save and publish
-
-### Content Structure
-
-```
-Home Page Fields:
-├── Hero Section
-│   ├── Title (CharField)
-│   ├── Subtitle (CharField, optional)
-│   ├── Description (RichTextField)
-│   ├── Primary Button (text + URL)
-│   └── Secondary Button (text + URL)
-├── Conference Info
-│   ├── Section Title (CharField)
-│   └── Description (RichTextField)
-├── Features (StreamField)
-│   └── Feature Cards (title, description, icon, link)
-└── Year Navigation
-    ├── Section Title (CharField)
-    └── Description (RichTextField)
+```bash
+git clone https://github.com/pyconng/ng-pycon.git
+cd ng-pycon
 ```
 
-## Development
+### 2. Create a virtual environment
 
-### Frontend Development
-
-- **Watch CSS changes**: `npm run build-css` (watches for changes)
-- **Build production CSS**: `npm run build-css-prod`
-- **Development with hot reload**: `npm run dev`
-
-### Backend Development
-
-- **Custom applications**: Place in `pyconng/apps/`
-- **Templates**: Located in `pyconng/templates/`
-- **Static files**: Located in `pyconng/static/`
-- **Content management**: All content via Wagtail admin
-
-### Adding New Content Types
-
-1. **Create models** in your app with Wagtail fields
-2. **Define content panels** for the admin interface
-3. **Create templates** that use the model fields
-4. **Run migrations** to update the database
-
-Example:
-```python
-class EventPage(Page):
-    description = RichTextField()
-    date = models.DateField()
-    
-    content_panels = Page.content_panels + [
-        FieldPanel('description'),
-        FieldPanel('date'),
-    ]
+```bash
+python -m venv venv
+source venv/bin/activate   # On Windows: venv\Scripts\activate
 ```
 
-### Yearly Theming System
+### 3. Install Python dependencies
 
-The theming system uses CSS custom properties and data attributes:
-
-```html
-<!-- Set theme in template -->
-<html data-theme="2024">
-
-<!-- CSS custom properties -->
-[data-theme="2024"] {
-  --theme-primary: theme('colors.blue.600');
-  --theme-secondary: theme('colors.green.600');
-}
-
-[data-theme="2025"] {
-  --theme-primary: theme('colors.purple.600');
-  --theme-secondary: theme('colors.pink.600');
-}
+```bash
+pip install -r requirements.txt
 ```
 
-### Project Structure
+### 4. Install Node dependencies (for Tailwind CSS)
 
-```
-├── pyconng/
-│   ├── apps/              # Custom Django applications
-│   ├── settings/          # Django settings (base, dev, production)
-│   ├── static/
-│   │   ├── css/
-│   │   │   ├── src/       # Tailwind CSS source files
-│   │   │   └── pyconng.css # Generated CSS
-│   │   └── js/
-│   │       ├── pyconng.js  # Custom JavaScript
-│   │       └── alpine.min.js # Alpine.js
-│   └── templates/         # Django templates
-├── home/                  # Home page app with Wagtail models
-├── scripts/               # Development scripts
-├── docker-compose.yml     # Docker services
-├── Dockerfile            # Multi-stage build
-├── package.json          # Node.js dependencies
-├── tailwind.config.js    # Tailwind CSS configuration
-└── postcss.config.js     # PostCSS configuration
+```bash
+npm install
 ```
 
-## URL Structure
+### 5. Set up environment variables
 
-- **`/`** → Current year (2025) with latest design
-- **`/2024/`** → 2024 conference with tech theme
-- **`/2025/`** → 2025 conference with creative theme
-- **`/admin/`** → Wagtail admin interface
+```bash
+cp .env.example .env
+```
 
-## Docker Services
-
-- **web**: Django application server
-- **db**: PostgreSQL 16 database
-- **frontend**: Node.js for CSS building (dev profile)
-
-## Available Scripts
-
-- `npm run build-css`: Watch and build CSS during development
-- `npm run build-css-prod`: Build minified CSS for production
-- `npm run dev`: Start development server with CSS watching
-- `./scripts/setup-dev.sh`: Complete development environment setup
-
-## Environment Variables
-
-Key environment variables (see `.env.example`):
+Edit `.env` and set at minimum:
 
 ```env
-# Database
+# Use SQLite for local dev (no PostgreSQL needed)
+DB=sqlite
+
+# Django
+SECRET_KEY=your-secret-key-here
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+```
+
+For PostgreSQL instead:
+
+```env
 DB_NAME=pyconng_db
 DB_USER=pyconng_user
 DB_PASSWORD=pyconng_password
-DB_HOST=db
+DB_HOST=localhost
 DB_PORT=5432
-
-# Django
-SECRET_KEY=your-secret-key
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
 ```
 
-## Contributing
+### 6. Run migrations
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+```bash
+python manage.py migrate
+```
+
+### 7. Create a superuser (optional)
+
+```bash
+python manage.py createsuperuser
+```
+
+### 8. Build CSS (first time)
+
+```bash
+npm run build-css
+```
+
+### 9. Start the development server
+
+```bash
+npm run dev
+```
+
+This runs:
+
+- **Tailwind CSS** in watch mode (rebuilds on file changes)
+- **Django development server** at http://127.0.0.1:8000/
+
+> **Note:** On first run, you may need to set up the Wagtail site at http://127.0.0.1:8000/admin/ (create a site and root page if prompted).
+
+---
+
+## Running the App
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start Django + Tailwind watch (recommended for development) |
+| `python manage.py runserver` | Start Django only (use after `npm run build-css`) |
+| `npm run build-css` | Build CSS once (for production) |
+| `npm run build-css-watch` | Watch and rebuild CSS only |
+
+---
+
+## Key URLs
+
+| Path | Description |
+|------|-------------|
+| `/` | Homepage (current year) |
+| `/admin/` | Wagtail CMS admin |
+| `/django-admin/` | Django admin |
+| `/dashboard/` | User dashboard (login required) |
+| `/tickets/` | Ticket purchase |
+| `/cfp/` | Call for Proposals |
+| `/grants/` | Travel Grant applications |
+| `/accounts/login/` | Sign in |
+| `/accounts/signup/` | Create account |
+
+---
+
+## Project Structure
+
+```
+ng-pycon/
+├── manage.py
+├── requirements.txt
+├── package.json
+├── .env.example
+├── pyconng/                 # Django project
+│   ├── settings/            # base, dev, production
+│   ├── apps/                # Django apps (tickets, cfp, grants, dashboard)
+│   ├── static/              # CSS, JS, images
+│   └── templates/           # Shared templates
+├── home/                    # Wagtail home & pages
+├── search/                  # Search
+└── to_docs/                 # Documentation
+```
+
+---
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DB` | `sqlite` for SQLite, anything else for PostgreSQL | — |
+| `DB_NAME` | PostgreSQL database name | `pyconng_db` |
+| `DB_USER` | PostgreSQL user | `pyconng_user` |
+| `DB_PASSWORD` | PostgreSQL password | `pyconng_password` |
+| `DB_HOST` | PostgreSQL host | `localhost` |
+| `DB_PORT` | PostgreSQL port | `5432` |
+| `SECRET_KEY` | Django secret key | — |
+| `DEBUG` | Debug mode | `True` (dev) |
+| `ALLOWED_HOSTS` | Comma-separated hosts | `localhost,127.0.0.1` |
+| `PAYSTACK_SECRET_KEY` | Paystack API secret | — |
+| `PAYSTACK_PUBLIC_KEY` | Paystack public key | — |
+
+---
 
 ## License
 
-This project is licensed under the MIT License. 
+MIT

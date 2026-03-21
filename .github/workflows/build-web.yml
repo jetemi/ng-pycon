@@ -27,7 +27,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: registry.gitlab.com/tuteria/v2/tutor-frontend-app/ng-pycon-web
+          images: ${{ secrets.GITLAB_IMAGE }}
           tags: |
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
             type=sha,prefix=,format=short

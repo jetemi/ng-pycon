@@ -53,6 +53,8 @@ services:
         condition: service_healthy
     env_file:
       - .env
+    environment:
+      - DEBUG=False
     networks:
       - default
       - traefik

@@ -28,13 +28,16 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
-    depends_on:
-      db:
-        condition: service_healthy
-      # - frontend
-    # Django reads DB_* from env_file below (see pyconng/settings/base.py), not DATABASE_URL
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file:
       - .env
+    environment:
+      DB_HOST: ${PGBOUNCER_HOST:-host.docker.internal}
+      DB_PORT: ${PGBOUNCER_PORT:-6432}
+      DB_NAME: ${PGBOUNCER_DB_NAME}
+      DB_USER: ${PGBOUNCER_DB_USER}
+      DB_PASSWORD: ${PGBOUNCER_DB_PASSWORD}
     networks:
       - default
       - traefik
@@ -48,13 +51,17 @@ services:
 
   web-prod:
     image: ${WEB_IMAGE:-ng-pycon-web:latest}
-    depends_on:
-      db:
-        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file:
       - .env
     environment:
-      - DEBUG=False
+      DB_HOST: ${PGBOUNCER_HOST:-host.docker.internal}
+      DB_PORT: ${PGBOUNCER_PORT:-6432}
+      DB_NAME: ${PGBOUNCER_DB_NAME}
+      DB_USER: ${PGBOUNCER_DB_USER}
+      DB_PASSWORD: ${PGBOUNCER_DB_PASSWORD}
+      DEBUG: "False"
     networks:
       - default
       - traefik

@@ -53,3 +53,4 @@ yarn-error.log*
 
 # Docker
 .dockerignore
+docker/pgbouncer/userlist.txt

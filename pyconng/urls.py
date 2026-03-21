@@ -46,11 +46,16 @@ urlpatterns = [
     path("", include(wagtail_urls)),
 ]
 
-from django.conf.urls.static import static
+from django.urls import re_path
+from django.views.static import serve
 
-# Always serve media files (Whitenoise handles static files in production)
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Serve media files in all environments (Whitenoise handles static files)
+urlpatterns += [
+    re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
+]
 
 if settings.DEBUG:
+    from django.conf.urls.static import static
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
     urlpatterns += staticfiles_urlpatterns()
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

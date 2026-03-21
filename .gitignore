@@ -4,6 +4,7 @@
 
 # Development scripts
 start.sh
+startup.sh
 
 # Python
 __pycache__/

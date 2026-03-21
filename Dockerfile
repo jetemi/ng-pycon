@@ -7,8 +7,8 @@ WORKDIR /app
 # Copy package files for frontend dependencies
 COPY package*.json ./
 
-# Install Node.js dependencies
-RUN npm ci --only=production
+# Install Node.js dependencies (devDependencies include tailwindcss required for `npm run build`)
+RUN npm ci
 
 # Copy source files needed for frontend build
 COPY tailwind.config.js ./
@@ -49,7 +49,7 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
  && rm -rf /var/lib/apt/lists/*
 
 # Install the application server.
-RUN pip install "gunicorn==20.0.4"
+RUN pip install "gunicorn==23.0.0"
 
 # Install the project requirements.
 COPY requirements.txt /
@@ -66,8 +66,12 @@ RUN chown wagtail:wagtail /app
 # Copy the source code of the project into the container.
 COPY --chown=wagtail:wagtail . .
 
-# Copy built frontend assets from the frontend-builder stage
-COPY --from=frontend-builder --chown=wagtail:wagtail /app/pyconng/static/css/pyconng.css ./pyconng/static/css/
+# Copy built theme CSS from the frontend-builder stage (matches `npm run build-css` outputs)
+COPY --from=frontend-builder --chown=wagtail:wagtail \
+    /app/pyconng/static/css/2024.css \
+    /app/pyconng/static/css/2025.css \
+    /app/pyconng/static/css/2026.css \
+    ./pyconng/static/css/
 COPY --from=frontend-builder --chown=wagtail:wagtail /app/node_modules/alpinejs/dist/cdn.min.js ./pyconng/static/js/alpine.min.js
 
 # Use user "wagtail" to run the build commands below and the server itself.

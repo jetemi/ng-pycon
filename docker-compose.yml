@@ -1,5 +1,6 @@
-version: '3.8'
-
+# Traefik is expected to run elsewhere (another compose stack or systemd).
+# Set TRAEFIK_NETWORK in .env to the Docker network your Traefik container is attached to,
+# then: docker compose up -d db web
 services:
   db:
     image: postgres:16
@@ -9,24 +10,60 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      # Creates schema matching DB_SCHEMA in Django (pyconng/settings/base.py) on first DB init only
+      - ./docker/postgres/init-pyconng-schema.sh:/docker-entrypoint-initdb.d/init-pyconng-schema.sh:ro
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"${DB_USER}\" -d \"${DB_NAME}\""]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
     restart: unless-stopped
 
   web:
     build: .
+    working_dir: /code
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
-    ports:
-      - "8000:8000"
     depends_on:
-      - db
-      - frontend
-    environment:
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      db:
+        condition: service_healthy
+      # - frontend
+    # Django reads DB_* from env_file below (see pyconng/settings/base.py), not DATABASE_URL
     env_file:
       - .env
+    networks:
+      - default
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      # Unique router name so this project does not collide with other stacks on the same Traefik
+      - "traefik.http.routers.ng-pycon-web.rule=Host(`${WEB_SUBDOMAIN}.${BASE_DOMAIN}`)"
+      - "traefik.http.routers.ng-pycon-web.entrypoints=${TRAEFIK_ENTRYPOINT:-web}"
+      - "traefik.http.services.ng-pycon-web.loadbalancer.server.port=8000"
+      - "traefik.http.routers.ng-pycon-web.service=ng-pycon-web"
+
+  web-prod:
+    image: ${WEB_IMAGE:-ng-pycon-web:latest}
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - default
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ng-pycon-web-prod.rule=Host(`${WEB_SUBDOMAIN}-prod.${BASE_DOMAIN}`)"
+      - "traefik.http.routers.ng-pycon-web-prod.entrypoints=${TRAEFIK_ENTRYPOINT:-web}"
+      - "traefik.http.services.ng-pycon-web-prod.loadbalancer.server.port=8000"
+      - "traefik.http.routers.ng-pycon-web-prod.service=ng-pycon-web-prod"
+    profiles:
+      - prod
 
   frontend:
     image: node:18-alpine
@@ -34,10 +71,16 @@ services:
     volumes:
       - .:/app
     command: npm run build-css
-    depends_on:
-      - web
+    # depends_on:
+    #   - web
     profiles:
       - dev
 
 volumes:
-  postgres_data: 
+  postgres_data:
+
+# External Traefik must share this network with `web` (see TRAEFIK_NETWORK in .env).
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK} 

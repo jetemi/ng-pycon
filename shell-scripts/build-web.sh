@@ -7,7 +7,7 @@ set -e
 
 TAG="${1:-latest}"
 REGISTRY="registry.gitlab.com"
-WEB_IMAGE="${REGISTRY}/pyung/ng-pycon/ng-pycon-web:${TAG}"
+WEB_IMAGE="${REGISTRY}/tuteria/v2/tutor-frontend-app/ng-pycon-web:${TAG}"
 
 echo "Starting web Docker build and push..."
 echo "Tag: ${TAG}"

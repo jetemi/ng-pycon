@@ -27,6 +27,9 @@ sys.path.insert(0, os.path.join(PROJECT_DIR, 'apps'))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-in-production')
+
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Application definition
 

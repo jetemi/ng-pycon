@@ -78,6 +78,17 @@ services:
     profiles:
       - dev
 
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    volumes:
+      - ./docker/pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini:ro
+      - ./docker/pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt:ro
+    ports:
+      - "6432:6432"
+    network_mode: host
+    profiles:
+      - tailscale
+
 volumes:
   postgres_data:
 

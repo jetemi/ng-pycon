@@ -11,9 +11,11 @@ from search import views as search_views
 from pyconng.views import year_page_serve
 from home.views import NewsletterSignupView, SignupView, LoginView, LogoutView
 
+ADMIN_PREFIX = getattr(settings, 'ADMIN_URL_PREFIX', 'admin')
+
 urlpatterns = [
-    path("django-admin/", admin.site.urls),
-    path("admin/", include(wagtailadmin_urls)),
+    path(f"{ADMIN_PREFIX}-djadmin/", admin.site.urls),
+    path(f"{ADMIN_PREFIX}/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
     path("newsletter/signup/", NewsletterSignupView.as_view(), name="newsletter_signup"),

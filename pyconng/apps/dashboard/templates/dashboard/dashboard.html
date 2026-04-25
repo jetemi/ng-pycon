@@ -1,5 +1,5 @@
 {% extends base_template %}
-{% load static %}
+{% load static wagtailcore_tags %}
 
 {% block title %}Dashboard - PyCon Nigeria {{ conference_year }}{% endblock %}
 
@@ -98,6 +98,22 @@
                                class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
                                 Learn More
                             </a>
+                        {% endif %}
+                    </div>
+                    {# Sponsorship #}
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <div class="text-2xl mb-3">🤝</div>
+                        <h3 class="font-semibold text-gray-900 mb-2">Sponsorship</h3>
+                        <p class="text-sm text-gray-500 mb-4">Reach builders and decision-makers—support visibility, hiring, and the Python &amp; AI ecosystem in Nigeria.</p>
+                        {% if sponsor_page %}
+                            <a href="{% pageurl sponsor_page %}"
+                               class="inline-flex items-center px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg transition-colors">
+                                View sponsorship
+                            </a>
+                        {% else %}
+                            <p class="text-sm text-gray-500 mb-4">Sponsorship information will be available here soon.</p>
+                            <span class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-400 font-medium rounded-lg cursor-not-allowed"
+                                  aria-disabled="true">Coming soon</span>
                         {% endif %}
                     </div>
                 </div>

@@ -4,6 +4,7 @@ Context processors for PyCon Nigeria website
 from django.conf import settings
 from django.db.models import Q
 from django.template.loader import get_template
+from django.urls import reverse
 from wagtail.models import Site
 import re
 
@@ -116,12 +117,13 @@ def navigation_context(request):
     
     navigation_items = None
     page_year = None
-    
+    home_page = None
+
     try:
         site = Site.find_for_request(request)
         if site:
             from home.models import HomePage
-            
+
             if year == CURRENT_YEAR:
                 # For current year, check if root_page itself is a HomePage (most common case)
                 # The site's root_page is typically the current year's homepage
@@ -195,15 +197,28 @@ def navigation_context(request):
                     home_page = home_page.specific
                     navigation_items = home_page.navigation_menu_items
                     page_year = home_page.conference_year or year
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         # If there's any error, navigation_items will remain None
         # In production, you might want to log this
         import logging
         logger = logging.getLogger(__name__)
         logger.error(f"Error getting navigation for year {year}: {e}")
-        pass
-    
+
+    nav_login_href = reverse("login")
+    nav_login_label = "Sign In"
+    if home_page is not None:
+        try:
+            from home.models import HomePage as HomePageModel
+
+            if isinstance(home_page, HomePageModel):
+                nav_login_href = home_page.get_login_href(request)
+                nav_login_label = home_page.get_login_label()
+        except Exception:  # noqa: BLE001
+            pass
+
     return {
-        'navigation_menu_items': navigation_items,
-        'page_conference_year': page_year,  # The year of the page providing navigation
-    } 
+        "navigation_menu_items": navigation_items,
+        "page_conference_year": page_year,
+        "nav_login_href": nav_login_href,
+        "nav_login_label": nav_login_label,
+    }

@@ -1,0 +1,167 @@
+{% extends base_template %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block body_class %}template-sponsorpage{% if page_theme %} {{ page_theme }}{% endif %}{% endblock %}
+
+{% block content %}
+{# Hero #}
+<section class="relative min-h-[22rem] md:min-h-[28rem] flex items-center overflow-hidden">
+    {% if page.hero_background %}
+        {% with hero_img_alt=page.hero_background_alt|default:page.hero_headline %}
+        {% image page.hero_background fill-1920x800 class="absolute inset-0 w-full h-full object-cover" alt=hero_img_alt %}
+        {% endwith %}
+    {% endif %}
+    {% if page.hero_overlay_style == 'dark' %}
+    <div class="absolute inset-0 bg-gray-900/70" aria-hidden="true"></div>
+    {% elif page.hero_overlay_style == 'light' %}
+    <div class="absolute inset-0 bg-white/80" aria-hidden="true"></div>
+    {% endif %}
+    {% if not page.hero_background %}
+        {% if page.hero_overlay_style == 'dark' %}
+        <div class="absolute inset-0 bg-gradient-to-br from-teal-900 to-teal-800" aria-hidden="true"></div>
+        {% elif page.hero_overlay_style == 'light' %}
+        <div class="absolute inset-0 bg-gradient-to-br from-teal-50 to-gray-100" aria-hidden="true"></div>
+        {% else %}
+        <div class="absolute inset-0 bg-gray-50" aria-hidden="true"></div>
+        {% endif %}
+    {% endif %}
+
+    <div class="theme-container relative z-10 w-full py-14 md:py-20">
+        <div class="max-w-3xl {% if page.hero_overlay_style == 'light' and page.hero_background %}text-gray-900{% elif page.hero_overlay_style == 'light' %}text-gray-900{% else %}text-white{% endif %}">
+            <h1 class="theme-heading text-4xl md:text-5xl font-bold mb-4 leading-tight">
+                {{ page.hero_headline }}
+            </h1>
+            {% if page.hero_subheadline %}
+            <p class="text-xl md:text-2xl font-medium opacity-95 mb-6">{{ page.hero_subheadline }}</p>
+            {% endif %}
+            {% if page.hero_intro %}
+            <div class="prose prose-lg max-w-none {% if page.hero_overlay_style == 'light' %}prose-gray{% else %}prose-invert{% endif %} mb-6">
+                {{ page.hero_intro|richtext }}
+            </div>
+            {% endif %}
+            {% if page.hero_event_summary %}
+            <div class="prose max-w-none {% if page.hero_overlay_style == 'light' %}prose-gray{% else %}prose-invert{% endif %} text-base opacity-95">
+                {{ page.hero_event_summary|richtext }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+{# Why sponsor #}
+<section class="theme-section bg-white">
+    <div class="theme-container">
+        <h2 class="theme-heading text-3xl md:text-4xl font-bold mb-4">{{ page.why_section_title }}</h2>
+        {% if page.why_intro %}
+        <div class="prose prose-lg max-w-none text-gray-600 mb-10">{{ page.why_intro|richtext }}</div>
+        {% endif %}
+        {% if page.why_benefits %}
+        <div class="grid md:grid-cols-2 gap-6 lg:gap-8">
+            {% for block in page.why_benefits %}
+                {% if block.block_type == 'benefit' %}
+                <div class="rounded-2xl border border-gray-100 bg-gray-50/80 p-6 shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="font-semibold text-lg text-teal-800 mb-3">{{ block.value.title }}</h3>
+                    <div class="prose prose-sm max-w-none text-gray-600">{{ block.value.body|richtext }}</div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{# Audience #}
+<section class="theme-section bg-gray-50">
+    <div class="theme-container">
+        <h2 class="theme-heading text-3xl md:text-4xl font-bold mb-4">{{ page.audience_section_title }}</h2>
+        {% if page.audience_intro %}
+        <div class="prose prose-lg max-w-none text-gray-600 mb-8">{{ page.audience_intro|richtext }}</div>
+        {% endif %}
+        {% if page.audience_points %}
+        <ul class="space-y-3 max-w-2xl">
+            {% for block in page.audience_points %}
+                {% if block.block_type == 'point' %}
+                <li class="flex gap-3 text-gray-700">
+                    <span class="text-teal-600 shrink-0 mt-1" aria-hidden="true">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </span>
+                    <span>{{ block.value }}</span>
+                </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+</section>
+
+{# Packages #}
+<section class="theme-section bg-white">
+    <div class="theme-container">
+        <h2 class="theme-heading text-3xl md:text-4xl font-bold mb-4 text-center">{{ page.packages_section_title }}</h2>
+        {% if page.packages_intro %}
+        <div class="prose prose-lg text-gray-600 mb-10 text-center max-w-3xl mx-auto">{{ page.packages_intro|richtext }}</div>
+        {% endif %}
+        {% if page.packages %}
+        <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+            {% for block in page.packages %}
+                {% if block.block_type == 'package' %}
+                <div class="rounded-2xl border p-6 flex flex-col bg-white {% if block.value.featured %}border-teal-500 border-2 shadow-lg ring-1 ring-teal-500/20 md:scale-[1.02]{% else %}border-gray-100 shadow-sm{% endif %}">
+                    {% if block.value.featured %}
+                    <p class="text-xs font-semibold uppercase tracking-wide text-teal-600 mb-2">Featured tier</p>
+                    {% endif %}
+                    <h3 class="theme-heading text-xl font-bold mb-1">{{ block.value.tier_name }}</h3>
+                    <p class="text-2xl font-bold text-teal-700 mb-3">{{ block.value.price_label }}</p>
+                    {% if block.value.best_for %}
+                    <p class="text-sm text-gray-600 mb-4">{{ block.value.best_for }}</p>
+                    {% endif %}
+                    <div class="prose prose-sm max-w-none text-gray-600 flex-grow">{{ block.value.benefits|richtext }}</div>
+                    {% if block.value.slots_note %}
+                    <p class="mt-4 text-sm font-medium text-gray-800 border-t border-gray-100 pt-4">{{ block.value.slots_note }}</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if page.packages_supplement %}
+        <div class="prose prose-lg text-gray-600 mt-12 max-w-3xl mx-auto">{{ page.packages_supplement|richtext }}</div>
+        {% endif %}
+    </div>
+</section>
+
+{# CTA + trust #}
+<section class="theme-section bg-teal-700 text-white">
+    <div class="theme-container">
+        <div class="max-w-3xl mx-auto text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">{{ page.cta_section_title }}</h2>
+            {% if page.cta_body %}
+            <div class="prose prose-lg max-w-none prose-invert mb-6 mx-auto">{{ page.cta_body|richtext }}</div>
+            {% endif %}
+            {% if page.cta_urgency_line %}
+            <p class="text-teal-100 font-medium mb-8">{{ page.cta_urgency_line }}</p>
+            {% endif %}
+            <div class="flex flex-wrap gap-4 justify-center items-center">
+                {% if page.cta_button_url and page.cta_button_label %}
+                <a href="{{ page.cta_button_url }}"
+                   class="inline-flex items-center px-6 py-3 bg-white text-teal-800 font-semibold rounded-lg shadow hover:bg-teal-50 transition-colors">
+                    {{ page.cta_button_label }}
+                </a>
+                {% endif %}
+                {% if page.cta_secondary_url and page.cta_secondary_label %}
+                <a href="{{ page.cta_secondary_url }}"
+                   class="inline-flex items-center px-6 py-3 border-2 border-white/80 text-white font-semibold rounded-lg hover:bg-white/10 transition-colors">
+                    {{ page.cta_secondary_label }}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% if page.cta_trust_note %}
+        <div class="max-w-2xl mx-auto mt-12 pt-10 border-t border-teal-500/50">
+            <div class="prose prose-sm max-w-none prose-invert text-teal-100/90 text-center">{{ page.cta_trust_note|richtext }}</div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

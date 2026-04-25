@@ -5,9 +5,12 @@ Role-based access: attendee, CFP reviewer, travel grant reviewer,
 program chair, finance team, super admin.
 """
 
+from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from wagtail.models import Site
 
+from home.models import HomePage, SponsorPage
 from pyconng.context_processors import CURRENT_YEAR
 
 from grants.models import GrantReviewerProfile, GrantReviewerAssignment
@@ -36,6 +39,68 @@ def _get_cfp_open():
         return CFPService.is_cfp_open()
     except Exception:
         return False
+
+
+def _get_current_year_home_page(request):
+    """
+    Resolve the live HomePage for CURRENT_YEAR (same strategy as navigation_context).
+    """
+    site = Site.find_for_request(request)
+    if not site:
+        return None
+
+    root_page = site.root_page.specific
+    home_page = None
+
+    if isinstance(root_page, HomePage):
+        if root_page.conference_year is None or root_page.conference_year == CURRENT_YEAR:
+            home_page = root_page
+
+    if not home_page:
+        child = (
+            site.root_page.get_children()
+            .type(HomePage)
+            .live()
+            .filter(
+                Q(conference_year__isnull=True) | Q(conference_year=CURRENT_YEAR)
+            )
+            .first()
+        )
+        if child:
+            home_page = child.specific
+
+    if not home_page:
+        home_page = (
+            HomePage.objects.live()
+            .filter(
+                Q(conference_year__isnull=True) | Q(conference_year=CURRENT_YEAR)
+            )
+            .first()
+        )
+
+    if not home_page and isinstance(root_page, HomePage):
+        home_page = root_page
+
+    return home_page
+
+
+def _get_current_year_sponsor_page(request):
+    """First live SponsorPage under the current year HomePage; prefer slug 'sponsorship'."""
+    home_page = _get_current_year_home_page(request)
+    if not home_page:
+        return None
+
+    qs = (
+        home_page.get_children()
+        .live()
+        .type(SponsorPage)
+        .specific()
+        .order_by("path")
+    )
+    preferred = qs.filter(slug="sponsorship").first()
+    if preferred:
+        return preferred
+    return qs.first()
 
 
 def dashboard(request):
@@ -82,6 +147,8 @@ def dashboard(request):
             reviewer=grant_profile
         ).count()
 
+    sponsor_page = _get_current_year_sponsor_page(request)
+
     context = {
         "conference_year": CURRENT_YEAR,
         "roles": roles,
@@ -92,6 +159,7 @@ def dashboard(request):
         "cfp_open": cfp_open,
         "cfp_context": cfp_context,
         "grant_assignment_count": grant_assignment_count,
+        "sponsor_page": sponsor_page,
     }
 
     return render(request, "dashboard/dashboard.html", context)

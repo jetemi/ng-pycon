@@ -1,10 +1,14 @@
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.urls import reverse
 
 from wagtail.models import Page
 from wagtail.fields import RichTextField, StreamField
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail import blocks
 from wagtail.images.blocks import ImageChooserBlock
+from wagtail.images import get_image_model_string
+from wagtail.blocks import PageChooserBlock
 
 
 class FeatureBlock(blocks.StructBlock):
@@ -26,7 +30,27 @@ class FeatureBlock(blocks.StructBlock):
 class NavigationSubItemBlock(blocks.StructBlock):
     """A sub-item within a navigation dropdown (e.g. 'Proposal Guidelines' under 'Speaking')."""
     label = blocks.CharBlock(max_length=80, required=True)
-    link_url = blocks.CharBlock(max_length=200, required=True, help_text="URL or page path")
+    page = PageChooserBlock(
+        target_model=Page,
+        required=False,
+        help_text="Pick an internal page, or leave blank and set URL below.",
+    )
+    link_url = blocks.CharBlock(
+        max_length=200,
+        required=False,
+        blank=True,
+        help_text="External URL, /path, or #anchor (used when no page is selected).",
+    )
+
+    def clean(self, value):
+        value = super().clean(value)
+        page = value.get("page")
+        link = (value.get("link_url") or "").strip()
+        if not page and not link:
+            raise ValidationError(
+                "Choose a page, or provide a URL / path for this sub-menu item."
+            )
+        return value
 
     class Meta:
         icon = "arrows-up-down"
@@ -36,11 +60,16 @@ class NavigationSubItemBlock(blocks.StructBlock):
 class NavigationMenuItemBlock(blocks.StructBlock):
     """A navigation menu item - can be a simple link or a dropdown with sub-items."""
     label = blocks.CharBlock(max_length=50, required=True)
+    page = PageChooserBlock(
+        target_model=Page,
+        required=False,
+        help_text="For a direct link: pick an internal page, or leave blank and set URL below.",
+    )
     link_url = blocks.CharBlock(
         max_length=200,
         required=False,
         blank=True,
-        help_text="URL for direct link. Leave blank if this item has sub-menu items."
+        help_text="URL or path when the item is a direct link (not required if this item only opens a dropdown).",
     )
     sub_items = blocks.ListBlock(
         NavigationSubItemBlock(),
@@ -48,6 +77,19 @@ class NavigationMenuItemBlock(blocks.StructBlock):
         blank=True,
         help_text="Add sub-menu items to show a dropdown. If empty, this will be a direct link."
     )
+
+    def clean(self, value):
+        value = super().clean(value)
+        subs = value.get("sub_items")
+        has_subs = bool(subs and len(subs) > 0)
+        if not has_subs:
+            page = value.get("page")
+            link = (value.get("link_url") or "").strip()
+            if not page and not link:
+                raise ValidationError(
+                    "For a top-level link (no sub-menu), choose a page or provide a URL / path."
+                )
+        return value
 
     class Meta:
         icon = "link"
@@ -84,6 +126,42 @@ class FooterLinkBlock(blocks.StructBlock):
     class Meta:
         icon = "link"
         label = "Footer Link"
+
+
+class SponsorBenefitBlock(blocks.StructBlock):
+    """A single 'why sponsor' benefit (title + body)."""
+    title = blocks.CharBlock(max_length=200)
+    body = blocks.RichTextBlock()
+
+    class Meta:
+        icon = "tick"
+        label = "Benefit"
+
+
+class SponsorPackageBlock(blocks.StructBlock):
+    """One sponsorship tier (e.g. Platinum, Gold)."""
+    tier_name = blocks.CharBlock(max_length=200)
+    price_label = blocks.CharBlock(max_length=120)
+    best_for = blocks.CharBlock(
+        max_length=300,
+        required=False,
+        help_text="Short line, e.g. 'Best for: talent acquisition'",
+    )
+    benefits = blocks.RichTextBlock()
+    slots_note = blocks.CharBlock(
+        max_length=200,
+        required=False,
+        help_text="e.g. 'Limited slots: 2'",
+    )
+    featured = blocks.BooleanBlock(
+        required=False,
+        default=False,
+        help_text="Visually emphasize this tier on the public page",
+    )
+
+    class Meta:
+        icon = "placeholder"
+        label = "Sponsorship package"
 
 
 class HomePage(Page):
@@ -180,11 +258,19 @@ class HomePage(Page):
         max_length=50,
         default="Login",
         blank=True,
-        help_text="Login button text (leave blank to hide)"
+        help_text="Sign-in control label (default: Sign In if left blank).",
+    )
+    login_link_page = models.ForeignKey(
+        "wagtailcore.Page",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text="Optional. Internal page for sign-in; used before Login button URL.",
     )
     login_button_url = models.URLField(
         blank=True,
-        help_text="Login button URL"
+        help_text="Optional URL if no page is selected (e.g. external or SSO).",
     )
     
     # Sponsor Section
@@ -270,7 +356,11 @@ class HomePage(Page):
 
     # Allow HomePage to be nested (for archived years) and have standard pages as children
     parent_page_types = ["wagtailcore.Page", "home.HomePage"]  # Can be root or child of another HomePage
-    subpage_types = ["home.StandardPage", "home.HomePage"]  # Can have standard pages and other year homepages
+    subpage_types = [
+        "home.StandardPage",
+        "home.SponsorPage",
+        "home.HomePage",
+    ]  # Standard pages, sponsor page, and nested year homepages
 
     def get_default_child_class(self):
         from .models import StandardPage
@@ -355,6 +445,18 @@ class HomePage(Page):
             for tt in ticket_types
         ]
 
+    def get_login_href(self, request=None):
+        """Page URL first, then custom URL, then default Login URL."""
+        if self.login_link_page_id and self.login_link_page:
+            return self.login_link_page.get_url(request=request) if request is not None else self.login_link_page.get_url()
+        if self.login_button_url:
+            return self.login_button_url
+        return reverse("login")
+
+    def get_login_label(self):
+        t = (self.login_button_text or "").strip()
+        return t if t else "Sign In"
+
     def get_context(self, request, *args, **kwargs):
         """
         Add theme information, sponsors_by_tier, and ticket_types to context for this HomePage.
@@ -405,9 +507,10 @@ class HomePage(Page):
         ], heading="Community Voting"),
         
         MultiFieldPanel([
-            FieldPanel('navigation_menu_items'),
-            FieldPanel('login_button_text'),
-            FieldPanel('login_button_url'),
+            FieldPanel("navigation_menu_items"),
+            FieldPanel("login_link_page"),
+            FieldPanel("login_button_url"),
+            FieldPanel("login_button_text"),
         ], heading="Navigation"),
         
         MultiFieldPanel([
@@ -504,5 +607,194 @@ class StandardPage(Page):
 
     class Meta:
         verbose_name = "Standard Page"
+
+
+class SponsorPage(Page):
+    """
+    Sponsorship landing page (CMS-driven). Child of HomePage only.
+    Inherits visual theme from the parent HomePage.
+    """
+
+    HERO_OVERLAY_CHOICES = [
+        ("dark", "Dark overlay (recommended for photos)"),
+        ("light", "Light overlay"),
+        ("none", "No overlay"),
+    ]
+
+    # Hero
+    hero_headline = models.CharField(max_length=200)
+    hero_subheadline = models.CharField(max_length=300, blank=True)
+    hero_intro = RichTextField(blank=True)
+    hero_background = models.ForeignKey(
+        get_image_model_string(),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text="Optional full-width hero background image",
+    )
+    hero_background_alt = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Alt text for the hero image (accessibility)",
+    )
+    hero_overlay_style = models.CharField(
+        max_length=20,
+        choices=HERO_OVERLAY_CHOICES,
+        default="dark",
+    )
+    hero_event_summary = RichTextField(
+        blank=True,
+        help_text="Dates, location, format, attendee scale (event overview)",
+    )
+
+    # Why sponsor
+    why_section_title = models.CharField(
+        max_length=200,
+        default="Why sponsor PyCon Nigeria?",
+    )
+    why_intro = RichTextField(blank=True)
+    why_benefits = StreamField(
+        [("benefit", SponsorBenefitBlock())],
+        blank=True,
+        use_json_field=True,
+        help_text="Key reasons to sponsor (e.g. talent, hiring, brand)",
+    )
+
+    # Audience
+    audience_section_title = models.CharField(
+        max_length=200,
+        default="Audience profile",
+    )
+    audience_intro = RichTextField(blank=True)
+    audience_points = StreamField(
+        [("point", blocks.CharBlock(max_length=400))],
+        blank=True,
+        use_json_field=True,
+        help_text="Bullet-style audience segments",
+    )
+
+    # Packages
+    packages_section_title = models.CharField(
+        max_length=200,
+        default="Sponsorship packages",
+    )
+    packages_intro = RichTextField(blank=True)
+    packages = StreamField(
+        [("package", SponsorPackageBlock())],
+        blank=True,
+        use_json_field=True,
+    )
+    packages_supplement = RichTextField(
+        blank=True,
+        help_text="Add-ons, community impact, custom options, etc.",
+    )
+
+    # CTA & trust
+    cta_section_title = models.CharField(
+        max_length=200,
+        default="Partner with us",
+    )
+    cta_body = RichTextField(blank=True)
+    cta_button_label = models.CharField(max_length=80, blank=True)
+    cta_button_url = models.CharField(
+        max_length=500,
+        blank=True,
+        help_text="Primary button URL or path (mailto: allowed)",
+    )
+    cta_secondary_label = models.CharField(max_length=80, blank=True)
+    cta_secondary_url = models.CharField(
+        max_length=500,
+        blank=True,
+        help_text="Secondary link, e.g. mailto:hello@example.org",
+    )
+    cta_urgency_line = models.CharField(
+        max_length=300,
+        blank=True,
+        help_text="Short urgency line, e.g. limited slots / early commitment",
+    )
+    cta_trust_note = RichTextField(
+        blank=True,
+        help_text="Organizer credibility, nonprofit / community messaging",
+    )
+
+    parent_page_types = ["home.HomePage"]
+    subpage_types = []
+
+    content_panels = Page.content_panels + [
+        MultiFieldPanel(
+            [
+                FieldPanel("hero_headline"),
+                FieldPanel("hero_subheadline"),
+                FieldPanel("hero_intro"),
+                FieldPanel("hero_background"),
+                FieldPanel("hero_background_alt"),
+                FieldPanel("hero_overlay_style"),
+                FieldPanel("hero_event_summary"),
+            ],
+            heading="Hero",
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("why_section_title"),
+                FieldPanel("why_intro"),
+                FieldPanel("why_benefits"),
+            ],
+            heading="Why sponsor",
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("audience_section_title"),
+                FieldPanel("audience_intro"),
+                FieldPanel("audience_points"),
+            ],
+            heading="Audience",
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("packages_section_title"),
+                FieldPanel("packages_intro"),
+                FieldPanel("packages"),
+                FieldPanel("packages_supplement"),
+            ],
+            heading="Packages",
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("cta_section_title"),
+                FieldPanel("cta_body"),
+                FieldPanel("cta_button_label"),
+                FieldPanel("cta_button_url"),
+                FieldPanel("cta_secondary_label"),
+                FieldPanel("cta_secondary_url"),
+                FieldPanel("cta_urgency_line"),
+                FieldPanel("cta_trust_note"),
+            ],
+            heading="Call to action & trust",
+        ),
+    ]
+
+    def get_parent_homepage(self):
+        parent = self.get_parent()
+        while parent:
+            if isinstance(parent.specific, HomePage):
+                return parent.specific
+            parent = parent.get_parent()
+        return None
+
+    def get_context(self, request, *args, **kwargs):
+        context = super().get_context(request, *args, **kwargs)
+        parent_homepage = self.get_parent_homepage()
+        if parent_homepage:
+            context["parent_homepage"] = parent_homepage
+            context["page_theme"] = parent_homepage.theme
+            context["page_conference_year"] = parent_homepage.conference_year
+        else:
+            context["page_theme"] = "default"
+            context["page_conference_year"] = None
+        return context
+
+    class Meta:
+        verbose_name = "Sponsor Page"
 
 

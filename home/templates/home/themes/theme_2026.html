@@ -11,11 +11,12 @@ undraw SVG illustrations.  All 12 editable sections rendered.
 
 {% block content %}
 
-<section class="hero-2026 text-white">
+<section class="hero-2026 text-white" aria-labelledby="hero-2026-title">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center">
+            <p class="hero-2026__kicker mb-4 animate-in" style="animation-delay:0.02s">Nigeria&rsquo;s Python conference</p>
             {# Title #}
-            <h1 class="text-5xl md:text-7xl font-extrabold mb-4 tracking-tight animate-in">
+            <h1 id="hero-2026-title" class="hero-2026__title text-5xl md:text-7xl font-extrabold mb-4 tracking-tight animate-in" style="animation-delay:0.06s">
                 {{ page.hero_title }}
                 {% if page.conference_year %}<span class="text-[#14B8A6]">{{ page.conference_year }}</span>{% endif %}
             </h1>
@@ -42,13 +43,6 @@ undraw SVG illustrations.  All 12 editable sections rendered.
                     {{ page.conference_location }}
                 </span>
                 {% endif %}
-            </div>
-            {% endif %}
-
-            {# Hero description #}
-            {% if page.hero_description %}
-            <div class="text-lg md:text-xl mb-8 max-w-3xl mx-auto opacity-90 leading-relaxed animate-in" style="animation-delay:.2s">
-                {{ page.hero_description|richtext }}
             </div>
             {% endif %}
 
@@ -90,6 +84,11 @@ undraw SVG illustrations.  All 12 editable sections rendered.
                 </a>
                 {% endif %}
             </div>
+
+            <a href="{% if page.conference_section_title or page.conference_description %}#conference{% elif page.features %}#highlights{% elif ticket_types %}#tickets{% elif page.sponsors %}#sponsors{% elif page.year_navigation_title %}#archive{% else %}#{% endif %}" class="hero-2026__scroll" aria-label="Scroll to main content">
+                <span class="hero-2026__scroll-line" aria-hidden="true"></span>
+                <svg class="hero-2026__scroll-chevron" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+            </a>
         </div>
     </div>
 
@@ -100,24 +99,25 @@ undraw SVG illustrations.  All 12 editable sections rendered.
 </section>
 
 {% if page.conference_section_title or page.conference_description %}
-<section class="section-2026">
+<section id="conference" class="section-2026 section-2026--intro js-reveal-2026">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="info-layout">
-            <div>
+            <div class="info-layout__text">
                 {% if page.conference_section_title %}
-                <h2 class="section-title-2026 text-left mb-4">{{ page.conference_section_title }}</h2>
+                <h2 class="section-title-2026 text-left mb-4 section-title-2026--ruled">{{ page.conference_section_title }}</h2>
                 {% endif %}
                 {% if page.conference_description %}
-                <div class="text-lg leading-relaxed text-gray-600">
+                <div class="text-lg leading-relaxed text-gray-600 prose-2026">
                     {{ page.conference_description|richtext }}
                 </div>
                 {% endif %}
             </div>
-            <div class="flex justify-center">
+            <div class="info-layout__visual flex justify-center">
                 <img src="{% static 'assets/2026/svg/idea.svg' %}"
                      alt="Conference idea illustration"
-                     class="section-illustration"
-                     style="max-width:320px">
+                     class="section-illustration info-layout__illustration"
+                     width="320"
+                     height="auto">
             </div>
         </div>
     </div>
@@ -125,11 +125,12 @@ undraw SVG illustrations.  All 12 editable sections rendered.
 {% endif %}
 
 {% if page.features %}
-<section class="section-2026 light-section">
+<section id="highlights" class="section-2026 light-section section-2026--highlights js-reveal-2026">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 class="section-title-2026">Conference Highlights</h2>
+        <p class="section-lead-2026">Keynotes, workshops, sprints, and space to connect with the community.</p>
 
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 feature-grid-2026">
             {% for block in page.features %}
             <div class="feature-card">
                 {% if block.value.icon_svg %}
@@ -206,7 +207,7 @@ undraw SVG illustrations.  All 12 editable sections rendered.
 {% endif %} -->
 
 {% if ticket_types %}
-<section class="section-2026">
+<section id="tickets" class="section-2026 section-2026--tickets js-reveal-2026">
     <div class="max-w-7xl mx-auto px-4 sm:px-8">
         <h2 class="section-title-2026">Tickets</h2>
         <p class="section-subtitle text-gray-500">Choose the pass that suits you best.</p>
@@ -238,7 +239,7 @@ undraw SVG illustrations.  All 12 editable sections rendered.
 {% endif %}
 
 {% if page.sponsors %}
-<section class="section-2026 light-section">
+<section id="sponsors" class="section-2026 light-section section-2026--sponsors js-reveal-2026">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {% if page.sponsor_section_title %}
         <h2 class="section-title-2026">{{ page.sponsor_section_title }}</h2>
@@ -246,9 +247,9 @@ undraw SVG illustrations.  All 12 editable sections rendered.
 
         {% if sponsors_by_tier %}
         {% for tier_name, sponsors in sponsors_by_tier %}
-        <div class="mb-10">
+        <div class="mb-10 sponsor-tier-block" data-sponsor-tier="{{ forloop.counter0 }}">
             <h3 class="sponsor-tier-title">{{ tier_name }}</h3>
-            <div class="flex flex-wrap justify-center items-center gap-6 max-w-4xl mx-auto">
+            <div class="flex flex-wrap justify-center items-center gap-6 max-w-4xl mx-auto sponsor-tier-logos">
                 {% for sponsor in sponsors %}
                 <div class="sponsor-logo-card flex justify-center items-center">
                     {% if sponsor.value.website_url %}
@@ -273,7 +274,7 @@ undraw SVG illustrations.  All 12 editable sections rendered.
 {% endif %}
 
 {% if page.year_navigation_title %}
-<section class="section-2026 dark-section relative overflow-hidden">
+<section id="archive" class="section-2026 dark-section relative overflow-hidden js-reveal-2026">
     {# Decorative stars illustration — background, faded #}
     <img src="{% static 'assets/2026/svg/stars.svg' %}"
          alt="" aria-hidden="true"

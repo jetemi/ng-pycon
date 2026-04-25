@@ -1,4 +1,4 @@
-{% load static %}
+{% load static wagtailcore_tags %}
 {% comment %}
 Shared navigation header with dropdown support.
 Uses inline x-data to avoid scope/store issues (e.g. when logged in with Wagtail userbar).
@@ -59,7 +59,7 @@ Uses inline x-data to avoid scope/store issues (e.g. when logged in with Wagtail
                                         style="display: none;">
                                         <div class="nav-dropdown-inner">
                                             {% for sub in sub_items %}
-                                            <a href="{{ sub.link_url }}" class="nav-dropdown-item">
+                                            <a href="{% if sub.page %}{% pageurl sub.page %}{% else %}{{ sub.link_url }}{% endif %}" class="nav-dropdown-item">
                                                 {{ sub.label }}
                                             </a>
                                             {% endfor %}
@@ -68,7 +68,7 @@ Uses inline x-data to avoid scope/store issues (e.g. when logged in with Wagtail
                                 </div>
                             {% else %}
                                 {% comment %}Simple link{% endcomment %}
-                                <a href="{{ item.value.link_url|default:'#' }}" class="theme-nav-link">
+                                <a href="{% if item.value.page %}{% pageurl item.value.page %}{% else %}{{ item.value.link_url|default:'#' }}{% endif %}" class="theme-nav-link">
                                     {{ item.value.label }}
                                 </a>
                             {% endif %}
@@ -86,8 +86,8 @@ Uses inline x-data to avoid scope/store issues (e.g. when logged in with Wagtail
                     <a href="{% url 'logout' %}" class="theme-nav-link">Sign Out</a>
                     {% else %}
                     <a href="{% url 'signup' %}" class="theme-nav-link">Sign Up</a>
-                    <a href="{% url 'login' %}" class="theme-button">
-                        Sign In
+                    <a href="{{ nav_login_href }}" class="theme-button">
+                        {{ nav_login_label }}
                     </a>
                     {% endif %}
                 {% else %}
@@ -137,14 +137,14 @@ Uses inline x-data to avoid scope/store issues (e.g. when logged in with Wagtail
                                         x-cloak
                                         style="display: none;">
                                         {% for sub in sub_items %}
-                                        <a href="{{ sub.link_url }}" class="mobile-nav-subitem block" @click="close()">
+                                        <a href="{% if sub.page %}{% pageurl sub.page %}{% else %}{{ sub.link_url }}{% endif %}" class="mobile-nav-subitem block" @click="close()">
                                             {{ sub.label }}
                                         </a>
                                         {% endfor %}
                                     </div>
                                 </div>
                             {% else %}
-                                <a href="{{ item.value.link_url|default:'#' }}" class="theme-nav-link block py-3" @click="close()">
+                                <a href="{% if item.value.page %}{% pageurl item.value.page %}{% else %}{{ item.value.link_url|default:'#' }}{% endif %}" class="theme-nav-link block py-3" @click="close()">
                                     {{ item.value.label }}
                                 </a>
                             {% endif %}
@@ -160,7 +160,7 @@ Uses inline x-data to avoid scope/store issues (e.g. when logged in with Wagtail
                     <a href="{% url 'logout' %}" class="theme-nav-link block">Sign Out</a>
                     {% else %}
                     <a href="{% url 'signup' %}" class="theme-nav-link block">Sign Up</a>
-                    <a href="{% url 'login' %}" class="theme-button block text-center mt-2">Sign In</a>
+                    <a href="{{ nav_login_href }}" class="theme-button block text-center mt-2">{{ nav_login_label }}</a>
                     {% endif %}
                 </div>
                 {% elif page_conference_year or conference_year != current_year %}

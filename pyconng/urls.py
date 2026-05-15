@@ -24,7 +24,33 @@ urlpatterns = [
     path("accounts/signup/", SignupView.as_view(), name="signup"),
     path("accounts/login/", LoginView.as_view(), name="login"),
     path("accounts/logout/", LogoutView.as_view(), name="logout"),
-    
+
+    # Password reset (uses Django's built-in views)
+    path(
+        "accounts/password_reset/",
+        auth_views.PasswordResetView.as_view(
+            email_template_name="registration/password_reset_email.txt",
+            html_email_template_name="registration/password_reset_email.html",
+            subject_template_name="registration/password_reset_subject.txt",
+        ),
+        name="password_reset",
+    ),
+    path(
+        "accounts/password_reset/done/",
+        auth_views.PasswordResetDoneView.as_view(),
+        name="password_reset_done",
+    ),
+    path(
+        "accounts/reset/<uidb64>/<token>/",
+        auth_views.PasswordResetConfirmView.as_view(),
+        name="password_reset_confirm",
+    ),
+    path(
+        "accounts/reset/done/",
+        auth_views.PasswordResetCompleteView.as_view(),
+        name="password_reset_complete",
+    ),
+
     # Tickets (must be before Wagtail catch-all)
     path("tickets/", include("tickets.urls")),
     

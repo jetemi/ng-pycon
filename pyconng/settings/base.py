@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "cfp",
     "grants",
     "dashboard",
+    "emails",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
     "wagtail.embeds",
@@ -61,6 +62,7 @@ INSTALLED_APPS = [
     "modelcluster",
     "taggit",
     "django_filters",
+    "anymail",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -105,6 +107,14 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "pyconng.wsgi.application"
+
+# Email — Resend via django-anymail
+ANYMAIL = {
+    "RESEND_API_KEY": os.environ.get("RESEND_API_KEY", ""),
+}
+EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+DEFAULT_FROM_EMAIL = "PyCon Nigeria <hello@hello.pynigeria.com>"
+SERVER_EMAIL = "hello@hello.pynigeria.com"
 
 
 # Database

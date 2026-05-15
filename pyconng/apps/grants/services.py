@@ -134,15 +134,19 @@ class GrantService:
 
     @staticmethod
     def on_application_submitted(application):
-        """Called when application is submitted: move to under_review, assign reviewers."""
+        """Called when application is submitted: move to under_review, assign reviewers, notify."""
+        from grants.emails import send_grant_submission_confirmation
+
         application.status = TravelGrantApplication.STATUS_UNDER_REVIEW
         application.save(update_fields=["status", "updated_at"])
         GrantService.auto_assign_reviewers(application, count=2)
+        send_grant_submission_confirmation(application)
 
     @staticmethod
     def bulk_decision(application_ids, decision, approved_amounts=None, actor_email=""):
         """Bulk approve / reject / waitlist. approved_amounts: {app_id: amount}."""
         from .models import TravelGrantPayment
+        from grants.emails import send_grant_decision
 
         status_map = {
             "approve": TravelGrantApplication.STATUS_APPROVED,
@@ -165,6 +169,7 @@ class GrantService:
                     defaults={"amount_paid": amount, "payment_status": TravelGrantPayment.STATUS_PENDING},
                 )
             app.save()
+            send_grant_decision(app)
             count += 1
         return count
 

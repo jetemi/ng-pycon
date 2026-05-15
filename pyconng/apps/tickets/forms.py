@@ -1,6 +1,5 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from django.core.mail import send_mail
 
 from .models import Coupon, Ticket, TicketSale, TicketType
 
@@ -194,16 +193,18 @@ class TicketTransferForm(forms.Form):
 
         # Notify the new owner
         ticket_type = ticket_sale.ticket_type_name
-        send_mail(
+        from emails.services import send_email
+
+        send_email(
+            template="tickets/transfer",
+            to=[email],
             subject="PyCon Nigeria - Ticket Transfer",
-            message=(
-                f"{old_owner.email} has transferred a PyCon Nigeria {ticket_type} ticket to you.\n\n"
-                f"Go to your dashboard to view details and update your ticket information.\n\n"
-                f"https://pycon.ng/tickets/\n\n"
-                f"Please ensure you update the ticket details with your information."
-            ),
-            from_email="hello@pynigeria.org",
-            recipient_list=[email],
+            context={
+                "old_owner_email": old_owner.email,
+                "ticket_type": ticket_type,
+                "dashboard_url": "https://pycon.ng/tickets/",
+            },
+            tags=["tickets", "transfer"],
             fail_silently=True,
         )
         return ticket_sale

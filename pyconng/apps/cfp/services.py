@@ -10,7 +10,6 @@ import io
 import json
 import logging
 
-from django.core.mail import send_mail
 from django.db import transaction
 from django.db.models import Avg
 from django.utils import timezone
@@ -246,60 +245,58 @@ class CFPService:
 
     @staticmethod
     def send_access_link(speaker, request=None):
+        from emails.services import send_email
+
         base_url = ""
         if request:
             base_url = f"{request.scheme}://{request.get_host()}"
-
         access_url = f"{base_url}/cfp/mine/?token={speaker.access_token}"
 
-        send_mail(
+        send_email(
+            template="cfp/access_link",
+            to=[speaker.email],
             subject="PyCon Nigeria CFP – Your Proposal Access Link",
-            message=(
-                f"Hi {speaker.full_name},\n\n"
-                f"Here is your link to manage your PyCon Nigeria "
-                f"{speaker.conference_year} proposals:\n\n"
-                f"{access_url}\n\n"
-                f"Keep this link safe – it's your personal access to view and "
-                f"manage your submissions.\n\n"
-                f"Best regards,\nPyCon Nigeria Team"
-            ),
-            from_email="hello@pynigeria.org",
-            recipient_list=[speaker.email],
+            context={
+                "speaker_name": speaker.full_name,
+                "conference_year": speaker.conference_year,
+                "access_url": access_url,
+            },
+            tags=["cfp", "access_link"],
             fail_silently=True,
         )
 
     @staticmethod
     def send_submission_confirmation(proposal, request=None):
+        from emails.services import send_email
+
         speaker = proposal.speaker
         base_url = ""
         if request:
             base_url = f"{request.scheme}://{request.get_host()}"
-
         proposal_url = (
-            f"{base_url}/cfp/proposal/{proposal.id}/"
-            f"?token={speaker.access_token}"
+            f"{base_url}/cfp/proposal/{proposal.id}/?token={speaker.access_token}"
         )
 
-        send_mail(
+        send_email(
+            template="cfp/submission_confirmation",
+            to=[speaker.email],
             subject=f"PyCon Nigeria CFP – Proposal Received: {proposal.title}",
-            message=(
-                f"Hi {speaker.full_name},\n\n"
-                f"Thank you for submitting your proposal to PyCon Nigeria "
-                f"{proposal.conference_year}!\n\n"
-                f"Proposal: {proposal.title}\n"
-                f"Track: {proposal.track.name if proposal.track else 'N/A'}\n"
-                f"Format: {proposal.get_format_display()}\n\n"
-                f"You can view your proposal here:\n{proposal_url}\n\n"
-                f"We'll notify you once a decision has been made.\n\n"
-                f"Best regards,\nPyCon Nigeria Team"
-            ),
-            from_email="hello@pynigeria.org",
-            recipient_list=[speaker.email],
+            context={
+                "speaker_name": speaker.full_name,
+                "conference_year": proposal.conference_year,
+                "proposal_title": proposal.title,
+                "track_name": proposal.track.name if proposal.track else "N/A",
+                "format_display": proposal.get_format_display(),
+                "proposal_url": proposal_url,
+            },
+            tags=["cfp", "submission"],
             fail_silently=True,
         )
 
     @staticmethod
     def send_decision_emails(proposal_ids, template_type, conference_year=None):
+        from emails.services import send_email
+
         year = conference_year or CURRENT_YEAR
         try:
             template = EmailTemplate.objects.get(
@@ -307,9 +304,7 @@ class CFPService:
             )
         except EmailTemplate.DoesNotExist:
             logger.warning(
-                "No email template found for type=%s year=%s",
-                template_type,
-                year,
+                "No email template found for type=%s year=%s", template_type, year,
             )
             return 0
 
@@ -317,7 +312,6 @@ class CFPService:
             "speaker", "track",
         )
         sent = 0
-
         for proposal in proposals:
             context = {
                 "speaker_name": proposal.speaker.full_name,
@@ -326,19 +320,18 @@ class CFPService:
             }
             try:
                 subject, body = template.render(context)
-                send_mail(
+                send_email(
+                    template="cfp/decision",
+                    to=[proposal.speaker.email],
                     subject=subject,
-                    message=body,
-                    from_email="hello@pynigeria.org",
-                    recipient_list=[proposal.speaker.email],
+                    context={"rendered_subject": subject, "rendered_body": body},
+                    tags=["cfp", "decision", template_type],
                     fail_silently=False,
                 )
                 sent += 1
             except Exception as exc:
                 logger.error(
-                    "Failed to send email to %s: %s",
-                    proposal.speaker.email,
-                    exc,
+                    "Failed to send email to %s: %s", proposal.speaker.email, exc,
                 )
         return sent
 

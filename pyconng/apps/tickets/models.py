@@ -226,12 +226,36 @@ class Ticket(models.Model):
         return Ticket.objects.filter(order=obj.order).first()
 
     def update_wallet_and_notify(self, full_payment):
-        """Mark this ticket (and related grouped tickets) as paid."""
+        """Mark this ticket (and related grouped tickets) as paid, then email confirmation."""
         new_amount = full_payment
         others = Ticket.objects.issued(self.user).values_list("pk", flat=True)
         if self.pk in others:
             Ticket.objects.filter(pk__in=others).update_payment(new_amount=new_amount)
         Ticket.objects.filter(pk=self.pk).update_payment(new_amount=new_amount)
+
+        self._send_purchase_confirmation_email()
+
+    def _send_purchase_confirmation_email(self):
+        from emails.services import send_email
+
+        self.refresh_from_db()
+        if not self.user or not self.user.email:
+            return
+        ticket_type_name = self.ticket_type.name if self.ticket_type else "Ticket"
+        send_email(
+            template="tickets/purchase_confirmation",
+            to=[self.user.email],
+            subject="Your PyCon Nigeria ticket is confirmed",
+            context={
+                "user_name": self.user.get_full_name() or self.user.email,
+                "ticket_type": ticket_type_name,
+                "quantity": self.quantity,
+                "order_code": self.order,
+                "dashboard_url": "https://pycon.ng/tickets/",
+            },
+            tags=["tickets", "purchase"],
+            fail_silently=False,
+        )
 
     def change_order(self):
         """Generate a new order code (used when payment fails)."""

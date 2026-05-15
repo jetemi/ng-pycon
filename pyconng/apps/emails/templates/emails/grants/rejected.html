@@ -1,0 +1,15 @@
+{% extends "emails/_base.html" %}
+{% block title %}Travel grant decision{% endblock %}
+{% block content %}
+  <p>Hi {{ applicant_name }},</p>
+  <p>Thank you for applying for a PyCon Nigeria {{ conference_year }} travel grant.</p>
+  <p>After careful review, we're unable to offer you a grant this year. We received many strong applications and had to make difficult choices.</p>
+  <p>We hope to see you at PyCon Nigeria. You can still join us as an attendee:</p>
+  <p style="margin:24px 0;">
+    <a href="https://pycon.ng/tickets/"
+       style="display:inline-block;background:#1a3a8f;color:#ffffff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600;">
+      Get a ticket
+    </a>
+  </p>
+  <p>All the best,<br>PyCon Nigeria Travel Grants Team</p>
+{% endblock %}

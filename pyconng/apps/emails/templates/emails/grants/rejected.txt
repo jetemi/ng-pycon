@@ -1,0 +1,12 @@
+{% extends "emails/_base.txt" %}{% block content %}Hi {{ applicant_name }},
+
+Thank you for applying for a PyCon Nigeria {{ conference_year }} travel grant.
+
+After careful review, we're unable to offer you a grant this year. We received many strong applications and had to make difficult choices.
+
+We hope to see you at PyCon Nigeria. You can still join us as an attendee at:
+https://pycon.ng/tickets/
+
+All the best,
+PyCon Nigeria Travel Grants Team
+{% endblock %}

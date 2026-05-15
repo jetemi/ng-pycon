@@ -1,0 +1,11 @@
+{% extends "emails/_base.txt" %}{% block content %}Hi {{ applicant_name }},
+
+Great news — your PyCon Nigeria {{ conference_year }} travel grant has been approved.
+
+Approved amount: {{ approved_amount }}
+
+You can view payment details and next steps in your dashboard:
+{{ dashboard_url }}
+
+Congratulations, and welcome to PyCon Nigeria.
+{% endblock %}

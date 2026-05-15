@@ -1,0 +1,10 @@
+{% extends "emails/_base.txt" %}{% block content %}Hi,
+
+{{ old_owner_email }} has transferred a PyCon Nigeria {{ ticket_type }} ticket to you.
+
+Go to your dashboard to view details and update your ticket information:
+
+{{ dashboard_url }}
+
+Please ensure you update the ticket details with your information.
+{% endblock %}

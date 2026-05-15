@@ -1,0 +1,13 @@
+{% extends "emails/_base.html" %}
+{% block title %}A ticket has been transferred to you{% endblock %}
+{% block content %}
+  <p>Hi,</p>
+  <p><strong>{{ old_owner_email }}</strong> has transferred a PyCon Nigeria <strong>{{ ticket_type }}</strong> ticket to you.</p>
+  <p style="margin:24px 0;">
+    <a href="{{ dashboard_url }}"
+       style="display:inline-block;background:#1a3a8f;color:#ffffff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600;">
+      Open my ticket dashboard
+    </a>
+  </p>
+  <p style="font-size:14px;color:#6b7280;">Please update the ticket details with your information.</p>
+{% endblock %}

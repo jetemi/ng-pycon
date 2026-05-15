@@ -1,0 +1,9 @@
+{% extends "emails/_base.txt" %}{% block content %}Hi {{ applicant_name }},
+
+Thanks for applying for a PyCon Nigeria {{ conference_year }} travel grant.
+
+We've received your application and it's now under review. We'll be in touch once a decision has been made.
+
+You can check the status of your application in your dashboard:
+{{ dashboard_url }}
+{% endblock %}

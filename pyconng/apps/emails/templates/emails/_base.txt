@@ -1,0 +1,7 @@
+=== PyCon Nigeria ===
+
+{% block content %}{% endblock %}
+
+--
+PyCon Nigeria · pycon.ng
+Questions? Reply to this email or write to {{ support_email }}.

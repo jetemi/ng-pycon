@@ -1,0 +1,13 @@
+{% extends "emails/_base.txt" %}{% block content %}Hi {{ user_name }},
+
+Thanks for your PyCon Nigeria ticket purchase!
+
+Ticket: {{ ticket_type }}
+Quantity: {{ quantity }}
+Order: {{ order_code }}
+
+Manage your tickets and add attendee details here:
+{{ dashboard_url }}
+
+See you at PyCon Nigeria!
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "emails/_base.html" %}
+{% block title %}Your PyCon Nigeria ticket is confirmed{% endblock %}
+{% block content %}
+  <p>Hi {{ user_name }},</p>
+  <p>Thanks for your PyCon Nigeria ticket purchase!</p>
+  <table role="presentation" cellpadding="0" cellspacing="0" style="margin:16px 0;font-size:15px;">
+    <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">Ticket</td><td>{{ ticket_type }}</td></tr>
+    <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">Quantity</td><td>{{ quantity }}</td></tr>
+    <tr><td style="padding:4px 12px 4px 0;color:#6b7280;">Order</td><td>{{ order_code }}</td></tr>
+  </table>
+  <p style="margin:24px 0;">
+    <a href="{{ dashboard_url }}"
+       style="display:inline-block;background:#1a3a8f;color:#ffffff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600;">
+      Manage my tickets
+    </a>
+  </p>
+  <p>See you at PyCon Nigeria!</p>
+{% endblock %}

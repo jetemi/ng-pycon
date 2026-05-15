@@ -1,0 +1,13 @@
+{% extends "emails/_base.html" %}
+{% block title %}Grant application received{% endblock %}
+{% block content %}
+  <p>Hi {{ applicant_name }},</p>
+  <p>Thanks for applying for a PyCon Nigeria {{ conference_year }} travel grant.</p>
+  <p>We've received your application and it's now under review. We'll be in touch once a decision has been made.</p>
+  <p style="margin:24px 0;">
+    <a href="{{ dashboard_url }}"
+       style="display:inline-block;background:#1a3a8f;color:#ffffff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600;">
+      Check application status
+    </a>
+  </p>
+{% endblock %}

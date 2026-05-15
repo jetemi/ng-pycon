@@ -1,0 +1,16 @@
+{% extends "emails/_base.txt" %}{% block content %}Hi {{ speaker_name }},
+
+Thank you for submitting your proposal to PyCon Nigeria {{ conference_year }}!
+
+Proposal: {{ proposal_title }}
+Track: {{ track_name }}
+Format: {{ format_display }}
+
+You can view your proposal here:
+{{ proposal_url }}
+
+We'll notify you once a decision has been made.
+
+Best regards,
+PyCon Nigeria Team
+{% endblock %}
